@@ -411,6 +411,7 @@ section:not(.hero-section) {
     font-weight: 600;
     line-height: 1.2;
     margin: 0;
+    color: #000000;
 }
 
 .stat-value {
@@ -419,6 +420,7 @@ section:not(.hero-section) {
     line-height: 1;
     margin-top: 6px;
     margin-bottom: 2px;
+    color: #000000;
 }
 
 .stat-bottom {
@@ -427,7 +429,7 @@ section:not(.hero-section) {
 
 .stat-subtitle {
     font-size: 13px;
-    color: #94A3B8;
+    color: #000000;
     display: block;
     margin-bottom: 0;
 }

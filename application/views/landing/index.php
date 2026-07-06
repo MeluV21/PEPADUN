@@ -151,17 +151,14 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
     <!-- CARD 4 -->
     <div class="col-lg-3 col-md-6">
         <div class="wf-card stat-card">
-            <div class="d-flex align-items-center">
-                <div class="stat-icon stat-icon-folder">
+                <div class="stat-top h-100 d-flex align-items-center justify-content-center">                <div class="stat-icon stat-icon-folder">
                     <i class="bi bi-folder2-open"></i>
                 </div>
                 <div class="ms-3">
-                    <div class="stat-title">Total Item</div>
+                    <div class="stat-title" style="font-size: 20px;">Total Item</div>
                     <div class="stat-value" id="val-total3"><?= $total_item ?></div>
-                    <div class="stat-subtitle">Item Informasi</div>
+                    <div class="stat-subtitle" style="font-size: 15px;">Item Informasi</div>
                 </div>
-            </div>
-            <!-- Progress bar sengaja dihilangkan untuk Card 4 sesuai desain -->
         </div>
     </div>
 
