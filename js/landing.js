@@ -55,12 +55,17 @@ $(document).ready(function() {
     setTimeout(checkAnimation, 300);
 
     // --- Chart.js Initialization ---
+    let kepatuhanChartInstance = null;
     const ctx = document.getElementById('kepatuhanChart');
     if (ctx) {
-        new Chart(ctx, {
+        // Set initial width
+        const initialLabels = ['Profil PPDI', 'Regulasi', 'Laporan', 'Standar Layanan', 'Informasi Publik'];
+        document.querySelector('.chart-wrapper').style.width = Math.max(initialLabels.length * 100, document.querySelector('.chart-scroll').clientWidth) + 'px';
+        
+        kepatuhanChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Profil PPDI', 'Regulasi', 'Laporan', 'Standar Layanan', 'Informasi Publik'],
+                labels: initialLabels,
                 datasets: [{
                     label: 'Kepatuhan',
                     data: [100, 90, 75, 80, 70],
@@ -118,10 +123,24 @@ $(document).ready(function() {
                 }
             }
         });
+    }
+
+    // Smooth scroll and collapse navbar for mobile
+    $('.nav-link').on('click', function(e) {
+        if (this.hash !== "") {
+            // Biarkan native CSS (scroll-behavior: smooth) yang menangani animasi scroll
+            // Kita hanya perlu menutup navbar jika sedang terbuka (di mobile)
+            var navbarCollapse = $('.navbar-collapse');
+            if (navbarCollapse.hasClass('show')) {
+                navbarCollapse.collapse('hide');
+            }
+        }
+    });
+
     // --- Simulated Realtime Update for Statistics ---
     // Mensimulasikan data dari backend secara realtime setiap 3.5 detik
     setInterval(function() {
-        // Ambil elemen
+        // Ambil elemen Card Atas
         var elTotal1 = document.getElementById('val-total1');
         var elTotal2 = document.getElementById('val-total2');
         var elTotal3 = document.getElementById('val-total3');
@@ -134,11 +153,9 @@ $(document).ready(function() {
         var barKepatuhan = document.getElementById('bar-kepatuhan');
 
         if(elTotal1 && elSelesai && elBelum) {
-            // Generate dummy update (misalnya total nambah 1-2, atau status berubah)
             var currentTotal = parseInt(elTotal3.innerText);
             var currentSelesai = parseInt(elSelesai.innerText);
             
-            // Random chance ada update baru
             if(Math.random() > 0.5) {
                 currentTotal += Math.floor(Math.random() * 2); 
                 currentSelesai += Math.floor(Math.random() * 3);
@@ -148,13 +165,10 @@ $(document).ready(function() {
                 }
                 
                 var currentBelum = currentTotal - currentSelesai;
-                
-                // Hitung persen
                 var persenSelesai = (currentSelesai / currentTotal) * 100;
                 var persenBelum = (currentBelum / currentTotal) * 100;
-                var kepatuhan = Math.min(100, Math.floor(persenSelesai + (Math.random() * 5))); // fake calculation
+                var kepatuhan = Math.min(100, Math.floor(persenSelesai + (Math.random() * 5)));
                 
-                // Animasi update teks
                 elTotal1.innerText = currentTotal;
                 elTotal2.innerText = currentTotal;
                 elTotal3.innerText = currentTotal;
@@ -162,10 +176,49 @@ $(document).ready(function() {
                 elBelum.innerText = currentBelum;
                 elKepatuhan.innerText = kepatuhan + '%';
                 
-                // Update CSS lebar bar
                 barSelesai.style.width = persenSelesai + '%';
                 barBelum.style.width = persenBelum + '%';
                 barKepatuhan.style.width = kepatuhan + '%';
+            }
+        }
+
+        // Simulasi Realtime untuk Chart (Penambahan Kategori Baru)
+        if (kepatuhanChartInstance) {
+            if (Math.random() > 0.6) { // 40% chance tambah chart bar
+                var labelCounter = kepatuhanChartInstance.data.labels.length + 1;
+                kepatuhanChartInstance.data.labels.push('Kategori ' + labelCounter);
+                kepatuhanChartInstance.data.datasets[0].data.push(Math.floor(Math.random() * 40) + 60); // random 60-100
+                
+                // Set wrapper width dynamically for scroll
+                var newWidth = kepatuhanChartInstance.data.labels.length * 110; 
+                document.querySelector('.chart-wrapper').style.width = Math.max(newWidth, document.querySelector('.chart-scroll').clientWidth) + 'px';
+                
+                kepatuhanChartInstance.update();
+            }
+        }
+
+        // Simulasi Realtime untuk Item Belum Update (Penambahan List)
+        var listContainer = document.getElementById('containerBelumUpdate');
+        if (listContainer) {
+            if (Math.random() > 0.5) { // 50% chance tambah item
+                var itemsCount = listContainer.children.length + 1;
+                var newItemHTML = `
+                <div class="list-row-item py-3 border-bottom d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 18px;"></i>
+                    </div>
+                    <div class="title fw-semibold text-dark flex-grow-1" style="font-size: 14px;">
+                        Item Dokumen Baru #${itemsCount}
+                    </div>
+                    <div class="text-secondary" style="font-size: 13px; width: 120px;">
+                        Kategori Baru
+                    </div>
+                    <div class="text-end text-secondary" style="font-size: 13px; width: 30px;">
+                        -
+                    </div>
+                </div>`;
+                
+                listContainer.insertAdjacentHTML('afterbegin', newItemHTML);
             }
         }
     }, 3500);

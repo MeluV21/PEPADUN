@@ -175,104 +175,57 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
 
     <!-- CHART -->
     <div class="col-lg-6">
-
         <div class="wf-card dashboard-card">
-
-            <div class="card-header-custom">
-
-                <h5 class="mb-0 fw-semibold text-ds-primary">
+            <div class="card-header-custom d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0 fw-bold text-ds-primary" style="font-size: 18px;">
                     Presentase Kepatuhan Per Kategori
                 </h5>
-
             </div>
-
             <div class="chart-scroll">
-
                 <div class="chart-wrapper">
-
                     <canvas id="kepatuhanChart"></canvas>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-
     <!-- ITEM BELUM UPDATE -->
-
     <div class="col-lg-6">
-
         <div class="wf-card dashboard-card">
-
-            <div class="card-header-custom">
-
-                <h5 class="mb-0 fw-semibold text-ds-primary">
+            <div class="card-header-custom d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0 fw-bold text-ds-primary" style="font-size: 18px;">
                     Item Belum Update
                 </h5>
-
             </div>
 
-
-            <div class="item-scroll">
-
+            <div class="item-scroll" id="containerBelumUpdate">
                 <?php
-
                 $belumUpdate = $belumUpdate ?? [
-
-                    [
-                        'judul'=>'Struktur Organisasi',
-                        'kategori'=>'Profil PPID'
-                    ],
-
-                    [
-                        'judul'=>'Registrasi Permintaan Informasi',
-                        'kategori'=>'Laporan'
-                    ],
-
-                    [
-                        'judul'=>'Laporan Keberatan',
-                        'kategori'=>'Laporan'
-                    ],
-
+                    ['judul'=>'Struktur Organisasi', 'kategori'=>'Profil PPID'],
+                    ['judul'=>'Registrasi Permintaan Informasi', 'kategori'=>'Laporan'],
+                    ['judul'=>'Laporan Keberatan', 'kategori'=>'Laporan'],
                 ];
-
                 ?>
 
-
                 <?php foreach($belumUpdate as $row): ?>
-
-                <div class="list-row-item">
-
-                    <div>
-
-                        <i class="bi bi-exclamation-triangle text-danger"></i>
-
+                <div class="list-row-item py-3 border-bottom d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 18px;"></i>
                     </div>
-
-                    <div class="title">
-
+                    <div class="title fw-semibold text-dark flex-grow-1" style="font-size: 14px;">
                         <?= $row['judul']; ?>
-
                     </div>
-
-                    <div>
-
+                    <div class="text-secondary" style="font-size: 13px; width: 120px;">
                         <?= $row['kategori']; ?>
-
                     </div>
-
-                    <div class="text-end">
-
+                    <div class="text-end text-secondary" style="font-size: 13px; width: 30px;">
                         -
-
                     </div>
-
                 </div>
-
                 <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
 
 
             </div>
