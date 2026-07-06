@@ -93,186 +93,76 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
 
     <!-- CARD 1 -->
     <div class="col-lg-3 col-md-6">
-
         <div class="wf-card stat-card bg-primary-custom">
-
-            <div class="stat-top">
-
-                <div class="stat-icon bg-white-transparent">
-                    <i class="bi bi-bar-chart-line-fill text-white"></i>
+            <div class="d-flex align-items-center">
+                <div class="stat-icon stat-icon-chart">
+                    <i class="bi bi-graph-up"></i>
                 </div>
-
-                <div class="stat-text">
-
-                    <div class="stat-title text-white">
-                        Tingkat Kepatuhan
-                    </div>
-
-                    <div class="stat-value text-white">
-                        <?= $tingkat_kepatuhan ?>%
-                    </div>
-
+                <div class="ms-3">
+                    <div class="stat-title text-white">Tingkat Kepatuhan</div>
+                    <div class="stat-value text-white" id="val-kepatuhan"><?= $tingkat_kepatuhan ?>%</div>
+                    <div class="stat-subtitle text-white stat-opacity">Kepatuhan Informasi Publik</div>
                 </div>
-
             </div>
-
-            <div class="stat-bottom">
-
-                <div class="stat-subtitle text-white-50">
-                    Kepatuhan Informasi Publik
-                </div>
-
-                <div class="wf-progress wf-progress-primary">
-
-                    <div
-                        class="wf-progress-bar"
-                        style="width:<?= $tingkat_kepatuhan ?>%;">
-                    </div>
-
-                </div>
-
+            <div class="wf-progress mt-3 stat-progress-bg-blue">
+                <div class="wf-progress-bar bg-white" id="bar-kepatuhan" style="width:<?= $tingkat_kepatuhan ?>%;"></div>
             </div>
-
         </div>
-
     </div>
 
     <!-- CARD 2 -->
     <div class="col-lg-3 col-md-6">
-
         <div class="wf-card stat-card">
-
-            <div class="stat-top">
-
-                <div class="stat-icon bg-ds-success">
-                    <i class="bi bi-check-lg text-white"></i>
+            <div class="d-flex align-items-center">
+                <div class="stat-icon stat-icon-check">
+                    <i class="bi bi-check-circle"></i>
                 </div>
-
-                <div class="stat-text">
-
-                    <div class="stat-title">
-                        Selesai / Update
-                    </div>
-
-                    <div class="stat-value">
-                        <?= $selesai_update ?>
-                    </div>
-
+                <div class="ms-3">
+                    <div class="stat-title">Selesai / Update</div>
+                    <div class="stat-value" id="val-selesai"><?= $selesai_update ?></div>
+                    <div class="stat-subtitle">Dari <span id="val-total1"><?= $total_item ?></span> Item</div>
                 </div>
-
             </div>
-
-            <div class="stat-bottom">
-
-                <div class="stat-subtitle">
-                    Dari <?= $total_item ?> Item
-                </div>
-
-                <div class="wf-progress">
-
-                    <div
-                        class="wf-progress-bar bg-ds-success"
-                        style="width:<?= $persen_selesai ?>%;">
-                    </div>
-
-                </div>
-
+            <div class="wf-progress mt-3 stat-progress-bg-gray">
+                <div class="wf-progress-bar bg-ds-success" id="bar-selesai" style="width:<?= $persen_selesai ?>%;"></div>
             </div>
-
         </div>
-
     </div>
 
     <!-- CARD 3 -->
     <div class="col-lg-3 col-md-6">
-
         <div class="wf-card stat-card">
-
-            <div class="stat-top">
-
-                <div class="stat-icon bg-ds-danger">
-                    <i class="bi bi-clock-history text-white"></i>
+            <div class="d-flex align-items-center">
+                <div class="stat-icon stat-icon-clock">
+                    <i class="bi bi-clock"></i>
                 </div>
-
-                <div class="stat-text">
-
-                    <div class="stat-title">
-                        Belum Update
-                    </div>
-
-                    <div class="stat-value">
-                        <?= $belum_update ?>
-                    </div>
-
+                <div class="ms-3">
+                    <div class="stat-title">Belum Update</div>
+                    <div class="stat-value" id="val-belum"><?= $belum_update ?></div>
+                    <div class="stat-subtitle">Dari <span id="val-total2"><?= $total_item ?></span> Item</div>
                 </div>
-
             </div>
-
-            <div class="stat-bottom">
-
-                <div class="stat-subtitle">
-                    Dari <?= $total_item ?> Item
-                </div>
-
-                <div class="wf-progress">
-
-                    <div
-                        class="wf-progress-bar bg-ds-danger"
-                        style="width:<?= $persen_belum ?>%;">
-                    </div>
-
-                </div>
-
+            <div class="wf-progress mt-3 stat-progress-bg-gray">
+                <div class="wf-progress-bar bg-ds-danger" id="bar-belum" style="width:<?= $persen_belum ?>%;"></div>
             </div>
-
         </div>
-
     </div>
 
     <!-- CARD 4 -->
     <div class="col-lg-3 col-md-6">
-
         <div class="wf-card stat-card">
-
-            <div class="stat-top">
-
-                <div class="stat-icon bg-ds-primary-light">
-                    <i class="bi bi-folder-fill text-white"></i>
+            <div class="d-flex align-items-center">
+                <div class="stat-icon stat-icon-folder">
+                    <i class="bi bi-folder2-open"></i>
                 </div>
-
-                <div class="stat-text">
-
-                    <div class="stat-title">
-                        Total Item
-                    </div>
-
-                    <div class="stat-value">
-                        <?= $total_item ?>
-                    </div>
-
+                <div class="ms-3">
+                    <div class="stat-title">Total Item</div>
+                    <div class="stat-value" id="val-total3"><?= $total_item ?></div>
+                    <div class="stat-subtitle">Item Informasi</div>
                 </div>
-
             </div>
-
-            <div class="stat-bottom">
-
-                <div class="stat-subtitle">
-                    Item Informasi Publik
-                </div>
-
-                <div class="wf-progress">
-
-                    <div
-                        class="wf-progress-bar"
-                        style="width:100%;">
-                    </div>
-
-                </div>
-
-            </div>
-
+            <!-- Progress bar sengaja dihilangkan untuk Card 4 sesuai desain -->
         </div>
-
     </div>
 
 </div>

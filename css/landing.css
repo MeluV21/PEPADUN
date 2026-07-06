@@ -370,7 +370,7 @@ section:not(.hero-section) {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 150px;
+    min-height: 150px;
 }
 
 .stat-top {
@@ -403,17 +403,18 @@ section:not(.hero-section) {
 }
 
 .stat-title {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     line-height: 1.2;
     margin: 0;
 }
 
 .stat-value {
-    font-size: 26px;
+    font-size: 32px;
     font-weight: 700;
     line-height: 1;
-    margin-top: 4px;
+    margin-top: 6px;
+    margin-bottom: 2px;
 }
 
 .stat-bottom {
@@ -421,10 +422,10 @@ section:not(.hero-section) {
 }
 
 .stat-subtitle {
-    font-size: 12px;
+    font-size: 13px;
     color: #94A3B8;
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 }
 
 .bg-primary-custom .stat-subtitle {
@@ -450,6 +451,57 @@ section:not(.hero-section) {
 
 .bg-primary-custom .wf-progress-bar {
     background: #fff;
+}
+
+/* ===========================
+   STATISTIC CARDS CUSTOM ICONS
+=========================== */
+.stat-icon-chart {
+    background-color: var(--ds-white);
+    color: var(--ds-primary);
+}
+
+.stat-icon-chart i {
+    font-size: 28px;
+}
+
+.stat-icon-check {
+    background-color: var(--ds-success);
+    color: var(--ds-white);
+}
+
+.stat-icon-check i {
+    font-size: 28px;
+}
+
+.stat-icon-clock {
+    background-color: var(--ds-danger);
+    color: var(--ds-white);
+}
+
+.stat-icon-clock i {
+    font-size: 28px;
+}
+
+.stat-icon-folder {
+    background-color: var(--ds-primary-light);
+    color: var(--ds-white);
+}
+
+.stat-icon-folder i {
+    font-size: 28px;
+}
+
+.stat-opacity {
+    opacity: 0.9;
+}
+
+.stat-progress-bg-blue {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.stat-progress-bg-gray {
+    background: var(--ds-border) !important;
 }
 
 /* ===========================

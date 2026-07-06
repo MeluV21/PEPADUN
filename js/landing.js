@@ -118,5 +118,55 @@ $(document).ready(function() {
                 }
             }
         });
-    }
+    // --- Simulated Realtime Update for Statistics ---
+    // Mensimulasikan data dari backend secara realtime setiap 3.5 detik
+    setInterval(function() {
+        // Ambil elemen
+        var elTotal1 = document.getElementById('val-total1');
+        var elTotal2 = document.getElementById('val-total2');
+        var elTotal3 = document.getElementById('val-total3');
+        var elSelesai = document.getElementById('val-selesai');
+        var elBelum = document.getElementById('val-belum');
+        var elKepatuhan = document.getElementById('val-kepatuhan');
+        
+        var barSelesai = document.getElementById('bar-selesai');
+        var barBelum = document.getElementById('bar-belum');
+        var barKepatuhan = document.getElementById('bar-kepatuhan');
+
+        if(elTotal1 && elSelesai && elBelum) {
+            // Generate dummy update (misalnya total nambah 1-2, atau status berubah)
+            var currentTotal = parseInt(elTotal3.innerText);
+            var currentSelesai = parseInt(elSelesai.innerText);
+            
+            // Random chance ada update baru
+            if(Math.random() > 0.5) {
+                currentTotal += Math.floor(Math.random() * 2); 
+                currentSelesai += Math.floor(Math.random() * 3);
+                
+                if (currentSelesai > currentTotal) {
+                    currentSelesai = currentTotal;
+                }
+                
+                var currentBelum = currentTotal - currentSelesai;
+                
+                // Hitung persen
+                var persenSelesai = (currentSelesai / currentTotal) * 100;
+                var persenBelum = (currentBelum / currentTotal) * 100;
+                var kepatuhan = Math.min(100, Math.floor(persenSelesai + (Math.random() * 5))); // fake calculation
+                
+                // Animasi update teks
+                elTotal1.innerText = currentTotal;
+                elTotal2.innerText = currentTotal;
+                elTotal3.innerText = currentTotal;
+                elSelesai.innerText = currentSelesai;
+                elBelum.innerText = currentBelum;
+                elKepatuhan.innerText = kepatuhan + '%';
+                
+                // Update CSS lebar bar
+                barSelesai.style.width = persenSelesai + '%';
+                barBelum.style.width = persenBelum + '%';
+                barKepatuhan.style.width = kepatuhan + '%';
+            }
+        }
+    }, 3500);
 });
