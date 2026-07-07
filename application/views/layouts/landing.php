@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Custom CSS based on Design System -->
     <link rel="stylesheet" href="<?= base_url('css/landing.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/informasi.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/tentang.css') ?>">
 </head>
 <body tabindex="0">
     
