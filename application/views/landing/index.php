@@ -151,7 +151,8 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
     <!-- CARD 4 -->
     <div class="col-lg-3 col-md-6">
         <div class="wf-card stat-card">
-                <div class="stat-top h-100 d-flex align-items-center justify-content-center">                <div class="stat-icon stat-icon-folder">
+            <div class="stat-top h-100 d-flex align-items-center justify-content-center">
+                <div class="stat-icon stat-icon-folder">
                     <i class="bi bi-folder2-open"></i>
                 </div>
                 <div class="ms-3">
@@ -159,6 +160,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                     <div class="stat-value" id="val-total3"><?= $total_item ?></div>
                     <div class="stat-subtitle" style="font-size: 15px;">Item Informasi</div>
                 </div>
+            </div>
         </div>
     </div>
 
@@ -224,17 +226,9 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
         </div>
     </div>
 
-
-            </div>
-
-        </div>
-
-    </div>
-
 </div>
 
 </div>
-
 </section>
 
 <!-- ===================================================== -->
@@ -282,7 +276,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
         <!-- Jadwal Monitoring Triwulan -->
         <div class="mb-5 mt-5 pt-4">
             <h3 class="info-section-title mb-4 text-center text-md-start">Jadwal Monitoring Triwulan</h3>
-            <div class="row g-3 align-items-center">
+            <div class="row g-4 align-items-stretch">
                 <div class="col-md-3 position-relative">
                     <div class="info-box-timeline text-center">
                         <div class="icon-timeline icon-tw1"><i class="bi bi-calendar-event"></i></div>
@@ -291,7 +285,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                     </div>
                     <div class="arrow-right d-none d-md-block"><i class="bi bi-arrow-right"></i></div>
                 </div>
-                <div class="col-md-3 position-relative mt-4 mt-md-0">
+                <div class="col-md-3 position-relative">
                     <div class="info-box-timeline text-center">
                         <div class="icon-timeline icon-tw2"><i class="bi bi-calendar-event"></i></div>
                         <h5>Triwulan II</h5>
@@ -299,7 +293,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                     </div>
                     <div class="arrow-right d-none d-md-block"><i class="bi bi-arrow-right"></i></div>
                 </div>
-                <div class="col-md-3 position-relative mt-4 mt-md-0">
+                <div class="col-md-3 position-relative">
                     <div class="info-box-timeline text-center">
                         <div class="icon-timeline icon-tw3"><i class="bi bi-calendar-event"></i></div>
                         <h5>Triwulan III</h5>
@@ -307,7 +301,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                     </div>
                     <div class="arrow-right d-none d-md-block"><i class="bi bi-arrow-right"></i></div>
                 </div>
-                <div class="col-md-3 mt-4 mt-md-0">
+                <div class="col-md-3">
                     <div class="info-box-timeline text-center">
                         <div class="icon-timeline icon-tw4"><i class="bi bi-calendar-event"></i></div>
                         <h5>Triwulan IV</h5>
@@ -353,6 +347,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
 
     </div>
 </section>
+
 <!-- ===================================================== -->
 <!-- TENTANG -->
 <!-- ===================================================== -->
