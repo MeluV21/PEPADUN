@@ -241,57 +241,118 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
 <!-- INFORMASI -->
 <!-- ===================================================== -->
 
-<section id="informasi" class="section-padding">
+<section id="informasi" class="section-padding bg-white">
     <div class="container">
-        <div class="section-heading text-center mb-5">
-            <h2>Jadwal Monitoring</h2>
-            <p>Monitoring keterbukaan informasi publik dilakukan setiap triwulan.</p>
-        </div>
-        <div class="timeline-wrapper">
-            <?php
-            $timeline = $timeline ?? [
-                ['title'=>'Triwulan I','bulan'=>'Januari - Maret'],
-                ['title'=>'Triwulan II','bulan'=>'April - Juni'],
-                ['title'=>'Triwulan III','bulan'=>'Juli - September'],
-                ['title'=>'Triwulan IV','bulan'=>'Oktober - Desember']
-            ];
-            ?>
-            <?php foreach($timeline as $i=>$row): ?>
-            <div class="timeline-item">
-                <div class="timeline-circle">
-                    <?= $i+1 ?>
+        
+        <!-- Banner Informasi Publik -->
+        <div class="info-banner mb-5">
+            <div class="row align-items-center">
+                <div class="col-md-7 info-banner-text p-md-4">
+                    <h2 class="info-banner-title">Informasi Publik</h2>
+                    <p class="info-banner-desc">Berikut informasi mengenai monitoring keterbukaan<br>informasi publik di BBPOM di Bandar Lampung.</p>
                 </div>
-                <h5><?= $row['title']; ?></h5>
-                <span><?= $row['bulan']; ?></span>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <div class="status-wrapper mt-5">
-            <div class="status-card success">
-                <i class="bi bi-check-circle-fill"></i>
-                <div>
-                    <h6>Sudah Update</h6>
-                    <small>Dokumen telah diperbarui.</small>
-                </div>
-            </div>
-            <div class="status-card warning">
-                <i class="bi bi-clock-fill"></i>
-                <div>
-                    <h6>Proses</h6>
-                    <small>Menunggu proses verifikasi.</small>
-                </div>
-            </div>
-            <div class="status-card danger">
-                <i class="bi bi-exclamation-circle-fill"></i>
-                <div>
-                    <h6>Belum Update</h6>
-                    <small>Dokumen belum diperbarui.</small>
+                <div class="col-md-5 text-center position-relative">
+                    <div class="info-icon-fallback py-3">
+                        <i class="bi bi-clipboard-check" style="font-size: 120px; color: #155bb5;"></i>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Apa itu PEPADUN? -->
+        <div class="row mb-5 align-items-center mt-5">
+            <div class="col-md-6 pe-md-5">
+                <h3 class="info-section-title mb-3">Apa itu PEPADUN?</h3>
+                <p class="info-section-desc">PEPADUN adalah sistem monitoring dan evaluasi keterbukaan informasi publik yang digunakan untuk memantau pembaruan dokumen informasi pada setiap bidang di lingkungan BBPOM di Bandar Lampung secara berkala setiap triwulan.</p>
+            </div>
+            <div class="col-md-6 mt-4 mt-md-0">
+                <div class="info-card-highlight">
+                    <div class="icon-circle">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                    <div>
+                        <h5>Monitoring Dilakukan Setiap</h5>
+                        <h3 class="fw-bold">3 Bulan (Triwulan)</h3>
+                        <p>Triwulan I, II, III, dan IV setiap tahun</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jadwal Monitoring Triwulan -->
+        <div class="mb-5 mt-5 pt-4">
+            <h3 class="info-section-title mb-4 text-center text-md-start">Jadwal Monitoring Triwulan</h3>
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3 position-relative">
+                    <div class="info-box-timeline text-center">
+                        <div class="icon-timeline icon-tw1"><i class="bi bi-calendar-event"></i></div>
+                        <h5>Triwulan I</h5>
+                        <p>1 Januari - 31 Maret</p>
+                    </div>
+                    <div class="arrow-right d-none d-md-block"><i class="bi bi-arrow-right"></i></div>
+                </div>
+                <div class="col-md-3 position-relative mt-4 mt-md-0">
+                    <div class="info-box-timeline text-center">
+                        <div class="icon-timeline icon-tw2"><i class="bi bi-calendar-event"></i></div>
+                        <h5>Triwulan II</h5>
+                        <p>1 April - 30 Juni</p>
+                    </div>
+                    <div class="arrow-right d-none d-md-block"><i class="bi bi-arrow-right"></i></div>
+                </div>
+                <div class="col-md-3 position-relative mt-4 mt-md-0">
+                    <div class="info-box-timeline text-center">
+                        <div class="icon-timeline icon-tw3"><i class="bi bi-calendar-event"></i></div>
+                        <h5>Triwulan III</h5>
+                        <p>1 Juli - 30 September</p>
+                    </div>
+                    <div class="arrow-right d-none d-md-block"><i class="bi bi-arrow-right"></i></div>
+                </div>
+                <div class="col-md-3 mt-4 mt-md-0">
+                    <div class="info-box-timeline text-center">
+                        <div class="icon-timeline icon-tw4"><i class="bi bi-calendar-event"></i></div>
+                        <h5>Triwulan IV</h5>
+                        <p>1 Oktober - 31 Desember</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Arti Status Monitoring -->
+        <div class="mt-5 pt-4">
+            <h3 class="info-section-title mb-4 text-center text-md-start">Arti Status Monitoring</h3>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="info-status-card">
+                        <div class="icon-status status-success"><i class="bi bi-check-circle"></i></div>
+                        <div>
+                            <h5>Selesai / Update</h5>
+                            <p>Bidang telah memperbarui dan melengkapi dokumen informasi sesuai ketentuan.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-status-card">
+                        <div class="icon-status status-danger"><i class="bi bi-x-circle"></i></div>
+                        <div>
+                            <h5>Belum Update</h5>
+                            <p>Bidang belum memperbarui dokumen informasi pada triwulan berjalan.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-status-card">
+                        <div class="icon-status status-warning"><i class="bi bi-clock"></i></div>
+                        <div>
+                            <h5>Dalam Proses</h5>
+                            <p>Bidang sedang dalam proses melengkapi dan memperbarui dokumen informasi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </section>
-
 <!-- ===================================================== -->
 <!-- TENTANG -->
 <!-- ===================================================== -->
