@@ -10,17 +10,17 @@
     --neutral-light: #E2E8F0;
     --bg-body: #F4F7FC;
     --white: #FFFFFF;
-    
+
     /* Text Colors */
     --text-dark: #0F172A;
     --text-muted: #64748B;
     --text-disabled: #94A3B8;
-    
+
     /* Shadow System */
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-    
+
     /* Border Radius */
     --br-4: 4px;
     --br-8: 8px;
@@ -46,7 +46,12 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-weight: 600;
     color: var(--text-dark);
 }
@@ -669,7 +674,7 @@ table.custom-table tbody tr:hover {
 }
 
 .container-1200 {
-    max-width: 1200px;
+    max-width: 1010px;
     margin: 0 auto;
     width: 100%;
 }
@@ -821,7 +826,7 @@ table.custom-table tbody tr:hover {
     padding: 3rem 2rem;
     margin-top: 4rem;
     margin-left: 270px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     transition: margin-left 0.3s ease;
 }
 
@@ -1030,9 +1035,21 @@ body.sidebar-collapsed .sidebar .btn-logout:hover::after {
 /* Stats Metric Panels Grid */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.25rem;
     margin-bottom: 2.25rem;
+}
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .dashboard-grid {
