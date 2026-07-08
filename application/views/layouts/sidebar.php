@@ -39,7 +39,7 @@
         </li>
         
         <li class="sidebar-item <?= ($segment === 'monitoring') ? 'active' : '' ?>">
-            <a href="<?= base_url('monitoring?year=2026&triwulan=1') ?>" class="sidebar-link sidebar-link-monitoring" data-title="Monitoring">
+            <a href="<?= base_url('monitoring') ?>" class="sidebar-link sidebar-link-monitoring" data-title="Monitoring">
                 <div class="sidebar-link-content">
                     <i class="bi bi-clipboard-check"></i>
                     <span>Monitoring</span>

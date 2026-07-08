@@ -1,191 +1,147 @@
-<!-- Filters Row -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: var(--white); padding: 1rem 1.5rem; border-radius: var(--br-12); box-shadow: var(--shadow-sm); border: 1px solid var(--neutral-light);">
-    <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-dark); font-weight: 500; font-size: 0.9rem;">
+<div class="page-header">
+    <h2>Dashboard</h2>
+    <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">
         <i class="bi bi-calendar3"></i> Hari ini: <?= date('d M Y') ?>
-    </div>
-    
-    <div style="display: flex; align-items: center; gap: 1rem;">
-        <label style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark); margin: 0;">Triwulan Aktif:</label>
-        <select class="select-control" style="width: auto; padding: 0.4rem 2.25rem 0.4rem 1rem; border-color: var(--primary); color: var(--primary); font-weight: 500;">
-            <option>Triwulan I (01 Jan - 31 Mar 2026)</option>
-            <option selected>Triwulan II (01 Apr - 30 Jun 2026)</option>
-            <option>Triwulan III (01 Jul - 30 Sep 2026)</option>
-            <option>Triwulan IV (01 Okt - 31 Des 2026)</option>
-        </select>
-    </div>
-
-    <div style="color: var(--text-muted); font-size: 0.85rem;">
-        <i class="bi bi-clock-history"></i> Terakhir diperbarui: <?= date('d M Y H:i') ?> WIB
     </div>
 </div>
 
-<!-- Stats Grid -->
+<!-- Stats Grid (Aligned to Section 06. CARD) -->
 <div class="stats-grid">
-    <!-- Card 1: Tingkat Kepatuhan -->
-    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <div>
-                <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Tingkat Kepatuhan</h4>
-                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;">85%</h2>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Kepatuhan Informasi Publik</p>
+    <!-- Card 1: Tingkat Kepatuhan (Radial Progress Bar) -->
+    <div class="card">
+        <div class="metric-card-content">
+            <div class="metric-text">
+                <h4>Tingkat Kepatuhan</h4>
+                <h2><?= esc($tingkatKepatuhan) ?>%</h2>
+                <p>Kepatuhan Informasi Publik</p>
             </div>
-            <div class="radial-progress-wrapper" style="width: 72px; height: 72px;">
-                <svg width="72" height="72" class="radial-progress-svg">
-                    <circle cx="36" cy="36" r="32" class="radial-progress-bg"></circle>
-                    <circle cx="36" cy="36" r="32" class="radial-progress-fill" style="stroke-dasharray: 201; stroke-dashoffset: calc(201 - (201 * 85) / 100);"></circle>
+            <div class="radial-progress-wrapper">
+                <svg width="64" height="64" class="radial-progress-svg">
+                    <circle cx="32" cy="32" r="28" class="radial-progress-bg"></circle>
+                    <circle cx="32" cy="32" r="28" class="radial-progress-fill" style="stroke-dasharray: 176; stroke-dashoffset: calc(176 - (176 * <?= esc($tingkatKepatuhan) ?>) / 100);"></circle>
                 </svg>
-                <div class="radial-progress-text" style="font-size: 0.9rem;">85%</div>
+                <div class="radial-progress-text"><?= esc($tingkatKepatuhan) ?>%</div>
             </div>
         </div>
     </div>
     
     <!-- Card 2: Selesai / Update -->
-    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-                <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Selesai / Update</h4>
-                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;">70</h2>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Dari 90 Item</p>
+    <div class="card">
+        <div class="metric-card-content">
+            <div class="metric-text">
+                <h4>Selesai / Update</h4>
+                <h2><?= esc($statusCompleted) ?></h2>
+                <p>Dari <?= esc($totalMonitoring) ?> item</p>
             </div>
-            <div style="width: 40px; height: 40px; border-radius: 50%; background-color: rgba(34, 197, 94, 0.1); display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 1.25rem;">
-                <i class="bi bi-check-lg" style="stroke: currentColor; stroke-width: 1;"></i>
-            </div>
-        </div>
-        <div style="margin-top: 1rem;">
-            <div style="height: 6px; width: 100%; background-color: var(--neutral-light); border-radius: 3px; overflow: hidden; margin-bottom: 0.75rem;">
-                <div style="height: 100%; width: 77%; background-color: var(--success); border-radius: 3px;"></div>
+            <div class="metric-icon-wrapper success">
+                <i class="bi bi-check-circle-fill"></i>
             </div>
         </div>
     </div>
     
     <!-- Card 3: Belum Update -->
-    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-                <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Belum Update</h4>
-                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;">20</h2>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Dari 90 Item</p>
+    <div class="card">
+        <div class="metric-card-content">
+            <div class="metric-text">
+                <h4>Belum Update</h4>
+                <h2><?= esc($statusPending) ?></h2>
+                <p>Dari <?= esc($totalMonitoring) ?> item</p>
             </div>
-            <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--danger); font-size: 1.25rem;">
-                <i class="bi bi-exclamation-lg" style="stroke: currentColor; stroke-width: 1;"></i>
-            </div>
-        </div>
-        <div style="margin-top: 1rem;">
-            <div style="height: 6px; width: 100%; background-color: var(--neutral-light); border-radius: 3px; overflow: hidden; margin-bottom: 0.75rem;">
-                <div style="height: 100%; width: 22%; background-color: var(--danger); border-radius: 3px;"></div>
+            <div class="metric-icon-wrapper danger">
+                <i class="bi bi-exclamation-circle-fill"></i>
             </div>
         </div>
     </div>
 
     <!-- Card 4: Total Item -->
-    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-                <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Total Item</h4>
-                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;">90</h2>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Item Informasi</p>
+    <div class="card">
+        <div class="metric-card-content">
+            <div class="metric-text">
+                <h4>Total Item</h4>
+                <h2><?= esc($totalMonitoring) ?></h2>
+                <p>Item Laporan Terdaftar</p>
             </div>
-            <div style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--secondary); display: flex; align-items: center; justify-content: center; color: var(--primary-light); font-size: 1.25rem;">
-                <i class="bi bi-folder-fill"></i>
+            <div class="metric-icon-wrapper primary">
+                <i class="bi bi-files"></i>
             </div>
-        </div>
-        <div style="margin-top: 1rem;">
-            <div style="height: 6px; width: 100%; background-color: var(--neutral-light); border-radius: 3px; overflow: hidden; margin-bottom: 0.75rem;"></div>
         </div>
     </div>
 </div>
 
-<!-- Chart Section -->
-<div class="card" style="margin-bottom: 1.5rem; padding: 1.75rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--neutral-light);">
-        <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--primary);">
-            <i class="bi bi-bar-chart-fill" style="font-size: 1.25rem;"></i>
-            <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0;">Presentase Kepatuhan Per Kategori</h3>
+<div class="dashboard-grid">
+    <!-- Left Column: Recent Activities -->
+    <div class="card" style="padding: 1.75rem;">
+        <div class="section-header-title">
+            <i class="bi bi-clock-history"></i>
+            <h3>Aktivitas Monitoring Terbaru</h3>
         </div>
-        <select class="select-control" style="width: auto; padding: 0.35rem 2.25rem 0.35rem 1rem; border-color: var(--neutral-light); color: var(--primary); font-size: 0.85rem; border-radius: var(--br-full); background-color: var(--white); font-weight: 500;">
-            <option>Semua Kategori</option>
-        </select>
+        
+        <div class="table-responsive" style="border: none; box-shadow: none;">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Tanggal</th>
+                        <th style="width: 40%;">Laporan Kerja</th>
+                        <th style="width: 25%;">Kategori</th>
+                        <th style="width: 20%;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($recentMonitoring)): ?>
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Belum ada laporan monitoring yang terekam.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($recentMonitoring as $item): ?>
+                            <tr>
+                                <td><?= date('d/m/Y', strtotime($item['activity_date'])) ?></td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-dark);"><?= esc($item['title']) ?></div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= esc($item['description']) ?></div>
+                                </td>
+                                <td>
+                                    <span style="font-size: 0.85rem; padding: 0.15rem 0.5rem; background: var(--secondary); color: var(--primary); border-radius: 5px; font-weight: 500;">
+                                        <?= esc($item['category_name']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <?php if ($item['status'] === 'completed'): ?>
+                                        <span class="badge badge-selesai">
+                                            <i class="bi bi-check-circle-fill"></i> Selesai
+                                        </span>
+                                    <?php elseif ($item['status'] === 'progress'): ?>
+                                        <span class="badge badge-proses">
+                                            <i class="bi bi-clock-fill"></i> Dalam Proses
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge badge-belum-update">
+                                            <i class="bi bi-exclamation-circle-fill"></i> Belum Update
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="margin-top: 1.5rem; text-align: right;">
+            <a href="<?= base_url('monitoring') ?>" class="btn btn-secondary btn-sm">
+                <span>Daftar Lengkap</span> <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
     </div>
-    <div style="position: relative; height: 320px; width: 100%; padding: 0 1rem;">
-        <canvas id="barChartCanvas"></canvas>
-    </div>
-</div>
 
-<!-- Table Section -->
-<div class="card" style="padding: 1.75rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--danger);">
-            <div style="background-color: var(--danger); color: var(--white); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">!</div>
-            <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0;">Item Belum Update</h3>
+    <!-- Right Column: Category Distribution Chart -->
+    <div class="card" style="display: flex; flex-direction: column; padding: 1.75rem;">
+        <div class="section-header-title">
+            <i class="bi bi-pie-chart-fill"></i>
+            <h3>Distribusi Kategori</h3>
         </div>
-        <a href="<?= base_url('monitoring') ?>" class="btn btn-secondary btn-sm" style="border-radius: var(--br-full); padding: 0.35rem 1rem; font-size: 0.8rem; font-weight: 600; color: var(--primary); border-color: var(--neutral-light);">
-            Lihat Semua <i class="bi bi-arrow-right"></i>
-        </a>
-    </div>
-    
-    <div class="table-responsive" style="border: none; box-shadow: none;">
-        <table class="custom-table" style="border-top: 1px dashed var(--neutral-light);">
-            <thead>
-                <tr>
-                    <th style="width: 45%; background: transparent; color: var(--text-muted); font-weight: 500; font-size: 0.8rem; border-bottom: 1px solid var(--neutral-light);">Item Informasi</th>
-                    <th style="width: 35%; background: transparent; color: var(--text-muted); font-weight: 500; font-size: 0.8rem; border-bottom: 1px solid var(--neutral-light);">Kategori</th>
-                    <th style="width: 20%; background: transparent; color: var(--text-muted); font-weight: 500; font-size: 0.8rem; border-bottom: 1px solid var(--neutral-light);">Keterangan</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Mock Data based on image -->
-                <tr>
-                    <td style="padding: 1rem;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <i class="bi bi-exclamation-triangle" style="color: var(--danger); font-size: 1.1rem;"></i>
-                            <span style="font-weight: 500; color: var(--text-dark); font-size: 0.9rem;">Struktur Organisasi</span>
-                        </div>
-                    </td>
-                    <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">Profil PPID</td>
-                    <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">-</td>
-                </tr>
-                <tr>
-                    <td style="padding: 1rem;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <i class="bi bi-exclamation-triangle" style="color: var(--danger); font-size: 1.1rem;"></i>
-                            <span style="font-weight: 500; color: var(--text-dark); font-size: 0.9rem;">Registrasi Permintaan Informasi</span>
-                        </div>
-                    </td>
-                    <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">Laporan</td>
-                    <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">-</td>
-                </tr>
-                <tr>
-                    <td style="padding: 1rem;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <i class="bi bi-exclamation-triangle" style="color: var(--danger); font-size: 1.1rem;"></i>
-                            <span style="font-weight: 500; color: var(--text-dark); font-size: 0.9rem;">Laporan Keberatan</span>
-                        </div>
-                    </td>
-                    <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">Laporan</td>
-                    <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">-</td>
-                </tr>
-                <tr>
-                    <td style="padding: 1rem;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <i class="bi bi-exclamation-triangle" style="color: var(--danger); font-size: 1.1rem;"></i>
-                            <span style="font-weight: 500; color: var(--text-dark); font-size: 0.9rem;">Laporan Tahunan</span>
-                        </div>
-                    </td>
-                    <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">Laporan</td>
-                    <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">-</td>
-                </tr>
-                <tr>
-                    <td style="padding: 1rem;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <i class="bi bi-exclamation-triangle" style="color: var(--danger); font-size: 1.1rem;"></i>
-                            <span style="font-weight: 500; color: var(--text-dark); font-size: 0.9rem;">Informasi Layanan Publik</span>
-                        </div>
-                    </td>
-                    <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">Informasi Publik</td>
-                    <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">-</td>
-                </tr>
-            </tbody>
-        </table>
+        <div style="position: relative; flex-grow: 1; min-height: 250px; display: flex; justify-content: center; align-items: center;">
+            <canvas id="categoryChartCanvas" style="max-width: 230px; max-height: 230px;"></canvas>
+        </div>
     </div>
 </div>
 
@@ -193,23 +149,35 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const barCtx = document.getElementById('barChartCanvas').getContext('2d');
+        const ctx = document.getElementById('categoryChartCanvas').getContext('2d');
         
-        const labels = ['Profil PPID', 'Regulasi', 'Laporan', 'Standar Layanan', 'Informasi Publik', 'Layanan Informasi', 'Keuangan', 'Pengelolaan Informasi'];
-        const dataVals = [100, 90, 75, 80, 70, 60, 50, 40];
+        const chartData = <?= json_encode($categoryChart) ?>;
         
-        new Chart(barCtx, {
-            type: 'bar',
+        const labels = chartData.map(item => item.category_name);
+        const dataVals = chartData.map(item => item.total);
+        
+        // Chart colors matching design system
+        const systemColors = [
+            '#0A4D9E', // Deep Blue (Primary)
+            '#3882F6', // Blue (Primary Light)
+            '#60A5FA', // Light Blue
+            '#93C5FD', // Light Blue 2
+            '#22C55E', // Green (Success)
+            '#F59E0B', // Yellow (Warning)
+            '#EF4444', // Red (Danger)
+            '#64748B'  // Grey (Neutral)
+        ];
+        
+        new Chart(ctx, {
+            type: 'doughnut',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Presentase Kepatuhan',
                     data: dataVals,
-                    backgroundColor: '#0A4D9E',
-                    hoverBackgroundColor: '#3882F6',
-                    borderRadius: 2,
-                    barPercentage: 0.7,
-                    categoryPercentage: 0.8
+                    backgroundColor: systemColors.slice(0, labels.length),
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    hoverOffset: 4
                 }]
             },
             options: {
@@ -217,83 +185,19 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.parsed.y + '%';
-                            }
+                        position: 'bottom',
+                        labels: {
+                            color: '#64748b',
+                            font: {
+                                size: 11,
+                                family: "'Poppins', sans-serif"
+                            },
+                            padding: 12
                         }
                     }
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            stepSize: 20,
-                            callback: function(value) {
-                                return value + '%';
-                            },
-                            font: {
-                                family: "'Poppins', sans-serif",
-                                size: 11
-                            },
-                            color: '#64748B'
-                        },
-                        border: {
-                            dash: [5, 5],
-                            display: false
-                        },
-                        grid: {
-                            color: '#E2E8F0',
-                            tickBorderDash: [5, 5],
-                            tickLength: 0
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false,
-                            drawBorder: false
-                        },
-                        ticks: {
-                            font: {
-                                family: "'Poppins', sans-serif",
-                                size: 11
-                            },
-                            color: '#64748B',
-                            padding: 10
-                        },
-                        border: {
-                            display: true,
-                            color: '#E2E8F0'
-                        }
-                    }
-                },
-                layout: {
-                    padding: {
-                        top: 20
-                    }
-                }
-            },
-            plugins: [{
-                id: 'customDatalabels',
-                afterDatasetsDraw: function(chart, args, options) {
-                    const ctx = chart.ctx;
-                    chart.data.datasets.forEach((dataset, i) => {
-                        const meta = chart.getDatasetMeta(i);
-                        meta.data.forEach((bar, index) => {
-                            const data = dataset.data[index];
-                            ctx.fillStyle = '#0F172A';
-                            ctx.font = '500 11px "Poppins", sans-serif';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'bottom';
-                            ctx.fillText(data + '%', bar.x, bar.y - 8);
-                        });
-                    });
-                }
-            }]
+                cutout: '72%'
+            }
         });
     });
 </script>

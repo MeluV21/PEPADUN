@@ -59,7 +59,14 @@ $(document).ready(function() {
     const ctx = document.getElementById('kepatuhanChart');
     if (ctx) {
         // Set initial width
-        const initialLabels = ['Profil PPDI', 'Regulasi', 'Laporan', 'Standar Layanan', 'Informasi Publik'];
+        let initialLabels = ['Profil PPDI', 'Regulasi', 'Laporan', 'Standar Layanan', 'Informasi Publik'];
+        let initialData = [100, 90, 75, 80, 70];
+
+        if (window.kepatuhanChartData && window.kepatuhanChartData.length > 0) {
+            initialLabels = window.kepatuhanChartData.map(item => item.label);
+            initialData = window.kepatuhanChartData.map(item => item.value);
+        }
+
         document.querySelector('.chart-wrapper').style.width = Math.max(initialLabels.length * 100, document.querySelector('.chart-scroll').clientWidth) + 'px';
         
         kepatuhanChartInstance = new Chart(ctx, {
@@ -68,7 +75,7 @@ $(document).ready(function() {
                 labels: initialLabels,
                 datasets: [{
                     label: 'Kepatuhan',
-                    data: [100, 90, 75, 80, 70],
+                    data: initialData,
                     backgroundColor: '#3882F6',
                     borderRadius: 4,
                     barThickness: 48
