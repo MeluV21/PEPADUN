@@ -26,9 +26,9 @@
         </div>
 
         <div class="form-group">
-            <label for="category_id">Kategori <span style="color: var(--text-muted); font-weight: normal; font-size: 0.8rem;">(Opsional)</span></label>
-            <select id="category_id" name="category_id" class="select-control">
-                <option value="" selected>Tanpa Kategori</option>
+            <label for="category_id">Kategori <span style="color: red;">*</span></label>
+            <select id="category_id" name="category_id" class="select-control" required>
+                <option value="" selected disabled>Pilih Kategori</option>
                 <?php foreach ($categories as $cat): ?>
                     <option value="<?= esc($cat['id']) ?>" <?= old('category_id') == $cat['id'] ? 'selected' : '' ?>>
                         <?= esc($cat['name']) ?>
@@ -38,9 +38,9 @@
         </div>
 
         <div class="form-group">
-            <label for="timeline">Timeline Waktu <span style="color: var(--text-muted); font-weight: normal; font-size: 0.8rem;">(Opsional)</span></label>
-            <select id="timeline" name="timeline" class="select-control">
-                <option value="" selected>Tanpa Timeline...</option>
+            <label for="timeline">Timeline Waktu <span style="color: red;">*</span></label>
+            <select id="timeline" name="timeline" class="select-control" required>
+                <option value="" selected disabled>Pilih Timeline...</option>
                 <option value="Realtime" <?= old('timeline') == 'Realtime' ? 'selected' : '' ?>>Realtime</option>
                 <option value="Harian" <?= old('timeline') == 'Harian' ? 'selected' : '' ?>>Harian</option>
                 <option value="Mingguan" <?= old('timeline') == 'Mingguan' ? 'selected' : '' ?>>Mingguan</option>
@@ -51,8 +51,8 @@
         </div>
 
         <div class="form-group">
-            <label for="tautan">Tautan / Link URL <span style="color: var(--text-muted); font-weight: normal; font-size: 0.8rem;">(Opsional)</span></label>
-            <input type="url" id="tautan" name="tautan" class="form-control" placeholder="Contoh: https://link-dokumen.com" value="<?= old('tautan') ?>" autocomplete="off">
+            <label for="tautan">Tautan / Link URL <span style="color: red;">*</span></label>
+            <input type="url" id="tautan" name="tautan" class="form-control" placeholder="Contoh: https://link-dokumen.com" value="<?= old('tautan') ?>" required autocomplete="off">
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 2rem; border-top: 1px solid var(--neutral-light); padding-top: 1.25rem;">

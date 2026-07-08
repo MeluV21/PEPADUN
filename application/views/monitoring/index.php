@@ -1,9 +1,17 @@
 <!-- Quarter Tabs System (Triwulan I - IV) protected by current year state -->
 <div class="triwulan-tabs-container">
-    <?php for ($t = 1; $t <= 4; $t++): ?>
+    <?php 
+        $triwulanLabels = [
+            1 => 'Triwulan I (Jan - Mar)',
+            2 => 'Triwulan II (Apr - Jun)',
+            3 => 'Triwulan III (Jul - Sep)',
+            4 => 'Triwulan IV (Okt - Des)'
+        ];
+        for ($t = 1; $t <= 4; $t++): 
+    ?>
         <a href="<?= base_url("monitoring?year={$selectedYear}&triwulan={$t}") ?>" 
            class="triwulan-tab-btn <?= ((int)$selectedTriwulan === $t) ? 'active' : '' ?>">
-            Triwulan <?= str_repeat('I', $t === 4 ? 3 : $t) ?><?= $t === 4 ? 'V' : '' /* Simple Roman numerals I, II, III, IV */ ?>
+            <?= $triwulanLabels[$t] ?>
         </a>
     <?php endfor; ?>
 </div>
@@ -27,7 +35,9 @@
                 <!-- Category filter dropdown -->
                 <select id="category" name="category" class="select-control" style="width: 170px; padding: 0.5rem 2rem 0.5rem 0.75rem; font-size: 0.85rem;">
                     <option value="">Semua Kategori</option>
-                    <?php foreach ($categories as $cat): ?>
+                    <?php foreach ($categories as $cat): 
+                        if (strtolower(trim($cat['name'])) === 'tanpa kategori') continue;
+                    ?>
                         <option value="<?= esc($cat['id']) ?>" <?= ($selectedCategory == $cat['id']) ? 'selected' : '' ?>>
                             <?= esc($cat['name']) ?>
                         </option>
@@ -41,7 +51,7 @@
                     </a>
                 <?php endif; ?>
                 <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem; background-color: #0c3d79; border-color: #0c3d79;">
-                    Terapkan Filter
+                    Cari
                 </button>
             </div>
 
@@ -89,7 +99,7 @@
                     <tr>
                         <td><?= $index + 1 + (($currentPage - 1) * $perPage) ?></td>
                         <td style="font-weight: 600; color: var(--text-dark);"><?= esc($item['custom_name'] ?: $item['name']) ?></td>
-                        <td><?= esc($item['category_name'] ?: '-') ?></td>
+                        <td><?= esc(empty($item['category_name']) || strtolower(trim($item['category_name'])) === 'tanpa kategori' || strtolower(trim($item['category_name'])) === 'lainnya' ? '-' : $item['category_name']) ?></td>
                         <td style="font-weight: 500;"><?= esc($item['pj'] ?: '-') ?></td>
                         <td style="color: var(--text-dark); font-size: 0.85rem; font-weight: 500;">
                             <?= esc($item['timeline'] ?: '-') ?>
@@ -211,36 +221,70 @@
     document.addEventListener('DOMContentLoaded', () => {
         const searchInput = document.getElementById('search');
         const searchIcon = document.getElementById('searchIcon');
+        const categorySelect = document.getElementById('category');
+        
         let debounceTimer;
+
+        // Restore focus if it was focused before form submission
+        if (sessionStorage.getItem('searchFocus') === '1' && searchInput) {
+            searchInput.focus();
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.value = val;
+            sessionStorage.removeItem('searchFocus');
+        } else if (searchInput && searchInput.value !== '') {
+            // Also focus if there's a search value (user arrived from a search link)
+            searchInput.focus();
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.value = val;
+        }
 
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 clearTimeout(debounceTimer);
                 
-                // If it is completely cleared, submit immediately
+                // If it is completely cleared, submit immediately to show all data
                 if (this.value === '') {
+                    sessionStorage.setItem('searchFocus', '1');
                     this.form.submit();
                     return;
                 }
                 
                 // Debounce search: submit form after 600ms of no typing
                 debounceTimer = setTimeout(() => {
+                    sessionStorage.setItem('searchFocus', '1');
                     this.form.submit();
                 }, 600);
             });
-
-            // Focus and put cursor at the end of the text on reload if there was search query
-            if (searchInput.value !== '') {
-                searchInput.focus();
-                const val = searchInput.value;
-                searchInput.value = '';
-                searchInput.value = val;
-            }
+            
+            // If they press Enter, remember focus
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sessionStorage.setItem('searchFocus', '1');
+                }
+            });
         }
 
         if (searchIcon && searchInput) {
             searchIcon.addEventListener('click', function() {
+                sessionStorage.setItem('searchFocus', '1');
                 searchInput.form.submit();
+            });
+        }
+
+        if (categorySelect) {
+            // Auto submit when category is selected
+            categorySelect.addEventListener('change', function() {
+                this.form.submit();
+            });
+            
+            // Allow Enter key to submit on select dropdown as well
+            categorySelect.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.form.submit();
+                }
             });
         }
         

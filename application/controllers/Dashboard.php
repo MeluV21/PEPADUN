@@ -17,25 +17,62 @@ class Dashboard extends Auth_Controller {
         $this->load->model('Master_informasi_model');
         $masterModel = $this->Master_informasi_model;
 
+        $currentYear = date('Y');
+        $currentTriwulan = ceil(date('m') / 3);
+        $db = $this->db;
+
         // 1. Core counters
         $data['totalUsers'] = $userModel->countAllResults();
         $data['totalCategories'] = $categoryModel->countAllResults();
-        $data['totalMonitoring'] = $masterModel->countAllResults(); // Use master as the source of truth for total items
+        
+        $queryTotal = $db->query("
+            SELECT COUNT(mi.id) as total
+            FROM master_informasi mi
+            LEFT JOIN monitoring m ON m.master_id = mi.id AND m.year = ? AND m.triwulan = ?
+            WHERE (m.is_deleted = 0 OR m.is_deleted IS NULL)
+        ", [$currentYear, $currentTriwulan]);
+        $data['totalMonitoring'] = $queryTotal->row()->total;
 
-        // 2. Monitoring by status (only count active overrides)
-        $data['statusPending'] = $monitoringModel->where('status', 'pending')->where('is_deleted', 0)->countAllResults();
-        $data['statusProgress'] = $monitoringModel->where('status', 'progress')->where('is_deleted', 0)->countAllResults();
-        $data['statusCompleted'] = $monitoringModel->where('status', 'completed')->where('is_deleted', 0)->countAllResults();
+        // 2. Monitoring by status for current triwulan
+        $queryCompleted = $db->query("
+            SELECT COUNT(mi.id) as total
+            FROM master_informasi mi
+            LEFT JOIN monitoring m ON m.master_id = mi.id AND m.year = ? AND m.triwulan = ?
+            WHERE m.status = 'completed' AND (m.is_deleted = 0 OR m.is_deleted IS NULL)
+        ", [$currentYear, $currentTriwulan]);
+        $data['statusCompleted'] = $queryCompleted->row()->total;
+
+        $queryProgress = $db->query("
+            SELECT COUNT(mi.id) as total
+            FROM master_informasi mi
+            LEFT JOIN monitoring m ON m.master_id = mi.id AND m.year = ? AND m.triwulan = ?
+            WHERE m.status = 'progress' AND (m.is_deleted = 0 OR m.is_deleted IS NULL)
+        ", [$currentYear, $currentTriwulan]);
+        $data['statusProgress'] = $queryProgress->row()->total;
+
+        $queryPending = $db->query("
+            SELECT COUNT(mi.id) as total
+            FROM master_informasi mi
+            LEFT JOIN monitoring m ON m.master_id = mi.id AND m.year = ? AND m.triwulan = ?
+            WHERE (m.status = 'pending' OR m.status IS NULL) AND (m.is_deleted = 0 OR m.is_deleted IS NULL)
+        ", [$currentYear, $currentTriwulan]);
+        $data['statusPending'] = $queryPending->row()->total;
+
+        if ($data['totalMonitoring'] > 0) {
+            $data['tingkatKepatuhan'] = round(($data['statusCompleted'] / $data['totalMonitoring']) * 100);
+        } else {
+            $data['tingkatKepatuhan'] = 0;
+        }
 
         // 3. Category distribution (for Chart.js)
-        $db = $this->db;
-        $query = $db->query('
-            SELECT c.name as category_name, COUNT(m.id) as total 
+        $query = $db->query("
+            SELECT c.name as category_name, COUNT(mi.id) as total 
             FROM categories c 
             LEFT JOIN master_informasi mi ON c.id = mi.category_id
-            LEFT JOIN monitoring m ON mi.id = m.master_id AND m.is_deleted = 0
+            LEFT JOIN monitoring m ON mi.id = m.master_id AND m.year = ? AND m.triwulan = ?
+            WHERE (m.is_deleted = 0 OR m.is_deleted IS NULL)
             GROUP BY c.id, c.name
-        ');
+        ", [$currentYear, $currentTriwulan]);
         $data['categoryChart'] = $query->result_array();
 
         // 4. Recent activities/monitoring

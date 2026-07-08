@@ -183,6 +183,9 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
             <div class="chart-scroll">
                 <div class="chart-wrapper">
                     <canvas id="kepatuhanChart"></canvas>
+                    <script>
+                        window.kepatuhanChartData = <?= $chartData ?? '[]' ?>;
+                    </script>
                 </div>
             </div>
         </div>

@@ -12,15 +12,15 @@
         <div class="metric-card-content">
             <div class="metric-text">
                 <h4>Tingkat Kepatuhan</h4>
-                <h2>85%</h2>
+                <h2><?= esc($tingkatKepatuhan) ?>%</h2>
                 <p>Kepatuhan Informasi Publik</p>
             </div>
             <div class="radial-progress-wrapper">
                 <svg width="64" height="64" class="radial-progress-svg">
                     <circle cx="32" cy="32" r="28" class="radial-progress-bg"></circle>
-                    <circle cx="32" cy="32" r="28" class="radial-progress-fill" style="stroke-dasharray: 176; stroke-dashoffset: calc(176 - (176 * 85) / 100);"></circle>
+                    <circle cx="32" cy="32" r="28" class="radial-progress-fill" style="stroke-dasharray: 176; stroke-dashoffset: calc(176 - (176 * <?= esc($tingkatKepatuhan) ?>) / 100);"></circle>
                 </svg>
-                <div class="radial-progress-text">85%</div>
+                <div class="radial-progress-text"><?= esc($tingkatKepatuhan) ?>%</div>
             </div>
         </div>
     </div>

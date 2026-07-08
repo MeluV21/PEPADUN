@@ -162,6 +162,6 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <!-- Custom JS -->
-    <script src="<?= base_url('js/landing.js') ?>"></script>
+    <script src="<?= base_url('js/landing.js') ?>?v=<?= time() ?>"></script>
 </body>
 </html>

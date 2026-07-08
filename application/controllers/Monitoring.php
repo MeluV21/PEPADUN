@@ -39,6 +39,7 @@ class Monitoring extends Auth_Controller {
                 ->orLike('monitoring.description', $searchFilter)
                 ->orLike('categories.name', $searchFilter)
                 ->orLike('monitoring.pj', $searchFilter)
+                ->orLike('master_informasi.timeline', $searchFilter)
                 ->orLike('users.fullname', $searchFilter);
 
             $lowerSearch = strtolower($searchFilter);
@@ -86,8 +87,7 @@ class Monitoring extends Auth_Controller {
         
         // Fetch paginated results
         $buildQuery();
-        $data['monitoringList'] = $masterModel->orderBy('categories.name', 'ASC')
-                                              ->orderBy('master_informasi.name', 'ASC')
+        $data['monitoringList'] = $masterModel->orderBy('master_informasi.id', 'ASC')
                                               ->limit($perPage, $offset)
                                               ->findAll();
         
@@ -121,8 +121,9 @@ class Monitoring extends Auth_Controller {
 
     public function store_master() {
         $this->form_validation->set_rules('name', 'Nama Informasi', 'required|min_length[3]|max_length[255]');
-        $this->form_validation->set_rules('category_id', 'Kategori', 'trim');
-        $this->form_validation->set_rules('timeline', 'Timeline Waktu', 'in_list[Realtime,Harian,Mingguan,Bulanan,Triwulan,Tahunan]');
+        $this->form_validation->set_rules('category_id', 'Kategori', 'required|trim');
+        $this->form_validation->set_rules('timeline', 'Timeline Waktu', 'required|in_list[Realtime,Harian,Mingguan,Bulanan,Triwulan,Tahunan]');
+        $this->form_validation->set_rules('tautan', 'Tautan', 'required');
 
         if ($this->form_validation->run() === FALSE) {
             session()->setFlashdata('error', 'Validasi gagal. Pastikan form terisi benar.');
