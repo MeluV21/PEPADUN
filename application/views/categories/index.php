@@ -10,7 +10,7 @@
     <table class="custom-table">
         <thead>
             <tr>
-                <th style="width: 10%;">ID Kategori</th>
+                <th style="width: 10%;">No.</th>
                 <th style="width: 25%;">Nama Kategori</th>
                 <th style="width: 45%;">Deskripsi Kategori</th>
                 <th style="width: 20%; text-align: right;">Aksi</th>
@@ -22,9 +22,9 @@
                     <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Belum ada kategori yang terdaftar.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($categories as $cat): ?>
+                <?php foreach ($categories as $index => $cat): ?>
                     <tr>
-                        <td style="font-weight: 500; color: var(--text-muted);">#<?= esc($cat['id']) ?></td>
+                        <td style="font-weight: 500; color: var(--text-muted);"><?= $index + 1 ?></td>
                         <td style="font-weight: 600; color: var(--text-dark);"><?= esc($cat['name']) ?></td>
                         <td style="color: var(--text-muted);"><?= esc($cat['description'] ?: '-') ?></td>
                         <td style="text-align: right;">
