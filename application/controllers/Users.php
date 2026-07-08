@@ -29,14 +29,15 @@ class Users extends Admin_Controller {
             redirect('users');
         }
 
-        $userModel->save([
-            'username' => $this->input->post('username'),
-            'fullname' => $this->input->post('fullname'),
-            'password' => password_hash($this->input->post('password'), PASSWORD_BCRYPT),
-            'role'     => $this->input->post('role'),
-        ]);
+        $data = $this->input->post();
+        if (isset($data[$this->security->get_csrf_token_name()])) {
+            unset($data[$this->security->get_csrf_token_name()]);
+        }
+        $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
 
-        session()->setFlashdata('success', 'Pengguna berhasil ditambahkan.');
+        $userModel->save($data);
+
+        session()->setFlashdata('success', 'Data karyawan berhasil ditambahkan.');
         redirect('users');
     }
 
@@ -70,15 +71,15 @@ class Users extends Admin_Controller {
             }
         }
 
-        $data = [
-            'username' => $username,
-            'fullname' => $this->input->post('fullname'),
-            'role'     => $this->input->post('role'),
-        ];
+        $data = $this->input->post();
+        if (isset($data[$this->security->get_csrf_token_name()])) {
+            unset($data[$this->security->get_csrf_token_name()]);
+        }
 
-        $password = $this->input->post('password');
-        if (!empty($password)) {
-            $data['password'] = password_hash($password, PASSWORD_BCRYPT);
+        if (empty($data['password'])) {
+            unset($data['password']);
+        } else {
+            $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         }
 
         $userModel->update($id, $data);
@@ -92,7 +93,7 @@ class Users extends Admin_Controller {
             ]);
         }
 
-        session()->setFlashdata('success', 'Pengguna berhasil diperbarui.');
+        session()->setFlashdata('success', 'Data karyawan berhasil diperbarui.');
         redirect('users');
     }
 

@@ -12,27 +12,34 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/login.css') ?>">
 </head>
 <body>
-    <div class="auth-wrapper">
+    <div class="login-container">
         <div class="auth-card">
+            
+            <!-- Tombol Kembali di Pojok Kiri Atas -->
+            <a href="<?= base_url() ?>" class="btn-back-top">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
+
             <div class="auth-brand">
-                <i class="bi bi-shield-fill-check" style="font-size: 3.5rem; color: var(--primary); display: block; margin-bottom: 0.5rem;"></i>
-                <h2>PEPADUN</h2>
-                <p style="text-transform: uppercase; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.25rem;">BADAN POM</p>
-                <span style="font-size: 0.75rem; color: var(--text-muted); display: block; line-height: 1.3;">Percepatan Pantau Dokumen serta Update Data dan Informasi</span>
+                <img src="<?= base_url('images/logo_text.png') ?>" alt="Logo BPOM">
+                
+                <h2 class="auth-title">Selamat Datang</h2>
+                <p class="auth-subtitle">Silakan masuk untuk melanjutkan ke sistem<br>PEPADUN BBPOM di Bandar Lampung</p>
             </div>
 
             <!-- Flash alerts -->
             <?php if (session()->getFlashdata('error')): ?>
-                <div class="alert alert-danger">
+                <div class="alert alert-danger" style="padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
                     <i class="bi bi-exclamation-circle-fill"></i>
                     <div><?= session()->getFlashdata('error') ?></div>
                 </div>
             <?php endif; ?>
 
             <?php if (session()->getFlashdata('success')): ?>
-                <div class="alert alert-success">
+                <div class="alert alert-success" style="padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
                     <i class="bi bi-check-circle-fill"></i>
                     <div><?= session()->getFlashdata('success') ?></div>
                 </div>
@@ -43,31 +50,47 @@
                 <?= csrf_field() ?>
                 
                 <div class="form-group">
-                    <label for="username">Username</label>
+                    <label for="username">Email</label>
                     <div class="input-icon-wrapper">
-                        <i class="bi bi-person"></i>
-                        <input type="text" id="username" name="username" class="form-control form-control-icon" placeholder="Masukkan username..." value="<?= old('username') ?>" required autocomplete="off">
+                        <i class="bi bi-envelope left-icon"></i>
+                        <input type="text" id="username" name="username" placeholder="Masukkan email Anda" value="<?= old('username') ?>" required autocomplete="off">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password">Kata Sandi</label>
                     <div class="input-icon-wrapper">
-                        <i class="bi bi-lock"></i>
-                        <input type="password" id="password" name="password" class="form-control form-control-icon" placeholder="Masukkan password..." required>
+                        <i class="bi bi-lock left-icon"></i>
+                        <input type="password" id="password" name="password" placeholder="Masukkan kata sandi Anda" required>
+                        <i class="bi bi-eye right-icon" id="togglePassword"></i>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; margin-top: 1.5rem;">
-                    <span>Masuk Ke Panel</span> <i class="bi bi-box-arrow-in-right"></i>
-                </button>
+                <div class="remember-me">
+                    <input type="checkbox" id="ingat_saya" name="ingat_saya">
+                    <label for="ingat_saya">Ingat saya</label>
+                </div>
 
-                <!-- Tombol Kembali ke Beranda (Secondary Button Design System) -->
-                <a href="<?= base_url() ?>" style="display: block; width: 100%; text-align: center; padding: 0.75rem; margin-top: 1rem; background-color: transparent; border: 1px solid #0A4D9E; color: #0A4D9E; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.3s ease;">
-                    <i class="bi bi-arrow-left" style="margin-right: 6px;"></i> Kembali ke Beranda
-                </a>
+                <button type="submit" class="btn-masuk" style="margin-bottom: 0;">
+                    Masuk
+                </button>
             </form>
         </div>
     </div>
+
+    <script>
+        // Toggle Password Visibility
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+
+        togglePassword.addEventListener('click', function (e) {
+            // toggle the type attribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            // toggle the icon
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+    </script>
 </body>
 </html>

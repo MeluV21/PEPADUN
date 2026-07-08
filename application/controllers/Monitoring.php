@@ -6,81 +6,96 @@ class Monitoring extends Auth_Controller {
         parent::__construct();
         $this->load->model('Monitoring_model');
         $this->load->model('Category_model');
+        $this->load->model('Master_informasi_model');
         $this->load->library('form_validation');
     }
 
     public function index() {
-        $monitoringModel = $this->Monitoring_model;
+        $masterModel = $this->Master_informasi_model;
         
-        $monitoringModel->select('monitoring.*, categories.name as category_name, users.fullname as reporter_name')
-            ->join('categories', 'categories.id = monitoring.category_id')
-            ->join('users', 'users.id = monitoring.created_by');
+        $yearFilter = $this->input->get('year') !== NULL ? $this->input->get('year') : date('Y');
+        $triwulanFilter = $this->input->get('triwulan') !== NULL ? $this->input->get('triwulan') : ceil(date('m') / 3);
 
-        // Year & Triwulan Filters
-        $yearFilter = $this->input->get('year') !== NULL ? $this->input->get('year') : '2026';
-        $triwulanFilter = $this->input->get('triwulan') !== NULL ? $this->input->get('triwulan') : 1;
-
-        $monitoringModel->where('YEAR(monitoring.activity_date)', (int)$yearFilter);
-
-        // Map Triwulan
-        switch ((int)$triwulanFilter) {
-            case 2:
-                $monitoringModel->where('MONTH(monitoring.activity_date) >=', 4)
-                                ->where('MONTH(monitoring.activity_date) <=', 6);
-                break;
-            case 3:
-                $monitoringModel->where('MONTH(monitoring.activity_date) >=', 7)
-                                ->where('MONTH(monitoring.activity_date) <=', 9);
-                break;
-            case 4:
-                $monitoringModel->where('MONTH(monitoring.activity_date) >=', 10)
-                                ->where('MONTH(monitoring.activity_date) <=', 12);
-                break;
-            case 1:
-            default:
-                $monitoringModel->where('MONTH(monitoring.activity_date) >=', 1)
-                                ->where('MONTH(monitoring.activity_date) <=', 3);
-                break;
-        }
-
-        // Text Search Filter
         $searchFilter = $this->input->get('search');
+        $categoryFilter = $this->input->get('category');
+        $statusFilter = $this->input->get('status');
+
+        $buildQuery = function() use ($masterModel, $yearFilter, $triwulanFilter, $searchFilter, $categoryFilter, $statusFilter) {
+            $masterModel->select('master_informasi.*, categories.name as category_name, monitoring.id as monitoring_id, monitoring.status, monitoring.pj, monitoring.description, monitoring.triwulan, monitoring.year, monitoring.custom_name, users.fullname as reporter_name')
+            ->join('categories', 'categories.id = master_informasi.category_id', 'left')
+            ->join('monitoring', "monitoring.master_id = master_informasi.id AND monitoring.triwulan = " . (int)$triwulanFilter . " AND monitoring.year = " . (int)$yearFilter, 'left')
+            ->join('users', 'users.id = monitoring.created_by', 'left');
+
+        // Hide deleted items for this triwulan
+        $masterModel->groupStart()
+                    ->where('monitoring.is_deleted', 0)
+                    ->orWhere('monitoring.is_deleted IS NULL')
+                    ->groupEnd();
+
         if (!empty($searchFilter)) {
-            $monitoringModel->groupStart()
-                ->like('monitoring.title', $searchFilter)
+            $masterModel->groupStart()
+                ->like('master_informasi.name', $searchFilter)
+                ->orLike('monitoring.custom_name', $searchFilter)
                 ->orLike('monitoring.description', $searchFilter)
                 ->orLike('categories.name', $searchFilter)
+                ->orLike('monitoring.pj', $searchFilter)
                 ->orLike('users.fullname', $searchFilter);
 
-            // Mapping Indonesian status search terms to database status values
             $lowerSearch = strtolower($searchFilter);
             if (strpos($lowerSearch, 'selesai') !== false || strpos($lowerSearch, 'complete') !== false) {
-                $monitoringModel->orLike('monitoring.status', 'completed');
+                $masterModel->orLike('monitoring.status', 'completed');
             }
             if (strpos($lowerSearch, 'proses') !== false || strpos($lowerSearch, 'progress') !== false || strpos($lowerSearch, 'jalan') !== false) {
-                $monitoringModel->orLike('monitoring.status', 'progress');
+                $masterModel->orLike('monitoring.status', 'progress');
             }
             if (strpos($lowerSearch, 'belum') !== false || strpos($lowerSearch, 'pending') !== false || strpos($lowerSearch, 'update') !== false) {
-                $monitoringModel->orLike('monitoring.status', 'pending');
+                $masterModel->orLike('monitoring.status', 'pending');
+                $masterModel->orWhere('monitoring.status IS NULL');
             }
-
-            $monitoringModel->groupEnd();
+            $masterModel->groupEnd();
         }
 
-        // Category Filter
-        $categoryFilter = $this->input->get('category');
         if (!empty($categoryFilter)) {
-            $monitoringModel->where('monitoring.category_id', $categoryFilter);
+            $masterModel->where('master_informasi.category_id', $categoryFilter);
         }
 
-        // Status Filter
-        $statusFilter = $this->input->get('status');
         if (!empty($statusFilter)) {
-            $monitoringModel->where('monitoring.status', $statusFilter);
+            if ($statusFilter == 'pending') {
+                $masterModel->groupStart()
+                    ->where('monitoring.status', 'pending')
+                    ->orWhere('monitoring.status IS NULL')
+                    ->groupEnd();
+            } else {
+                $masterModel->where('monitoring.status', $statusFilter);
+            }
         }
+        };
 
-        $data['monitoringList'] = $monitoringModel->orderBy('monitoring.activity_date', 'DESC')->findAll();
+        // Pagination logic
+        $page = (int)$this->input->get('page');
+        if ($page < 1) $page = 1;
         
+        $perPage = (int)$this->input->get('per_page');
+        if (!in_array($perPage, [10, 25, 50])) $perPage = 10;
+        
+        $offset = ($page - 1) * $perPage;
+        
+        // Count total results before applying limit
+        $buildQuery();
+        $totalRows = $masterModel->countAllResults();
+        
+        // Fetch paginated results
+        $buildQuery();
+        $data['monitoringList'] = $masterModel->orderBy('categories.name', 'ASC')
+                                              ->orderBy('master_informasi.name', 'ASC')
+                                              ->limit($perPage, $offset)
+                                              ->findAll();
+        
+        $data['currentPage'] = $page;
+        $data['perPage'] = $perPage;
+        $data['totalRows'] = $totalRows;
+        $data['totalPages'] = ceil($totalRows / $perPage);
+
         $categoryModel = $this->Category_model;
         $data['categories'] = $categoryModel->orderBy('name', 'ASC')->findAll();
         
@@ -95,137 +110,165 @@ class Monitoring extends Auth_Controller {
         $this->load->view('layouts/admin', $data);
     }
 
-    public function create() {
+    public function create_master() {
         $categoryModel = $this->Category_model;
         $data['categories'] = $categoryModel->orderBy('name', 'ASC')->findAll();
-        $data['title'] = 'Tambah Laporan Monitoring';
+        $data['title'] = 'Tambah Informasi Global';
         
-        $data['content_view'] = 'monitoring/form';
+        $data['content_view'] = 'monitoring/form_master';
         $this->load->view('layouts/admin', $data);
     }
 
-    public function store() {
-        $monitoringModel = $this->Monitoring_model;
-
-        $this->form_validation->set_rules('title', 'Judul', 'required|min_length[5]|max_length[255]');
-        $this->form_validation->set_rules('category_id', 'Kategori', 'required');
-        $this->form_validation->set_rules('description', 'Deskripsi', 'required|min_length[10]');
-        $this->form_validation->set_rules('activity_date', 'Tanggal Pelaksanaan', 'required|regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');
-        $this->form_validation->set_rules('status', 'Status', 'required|in_list[pending,progress,completed]');
+    public function store_master() {
+        $this->form_validation->set_rules('name', 'Nama Informasi', 'required|min_length[3]|max_length[255]');
+        $this->form_validation->set_rules('category_id', 'Kategori', 'trim');
+        $this->form_validation->set_rules('timeline', 'Timeline Waktu', 'in_list[Realtime,Harian,Mingguan,Bulanan,Triwulan,Tahunan]');
 
         if ($this->form_validation->run() === FALSE) {
-            session()->setFlashdata('error', 'Validasi gagal. Pastikan deskripsi minimal 10 karakter dan tanggal valid.');
-            redirect('monitoring/create');
+            session()->setFlashdata('error', 'Validasi gagal. Pastikan form terisi benar.');
+            redirect('monitoring/create_master');
         }
 
-        $monitoringModel->save([
-            'title'         => $this->input->post('title'),
-            'category_id'   => $this->input->post('category_id'),
-            'description'   => $this->input->post('description'),
-            'status'        => $this->input->post('status'),
-            'created_by'    => session()->get('id'),
-            'activity_date' => $this->input->post('activity_date'),
+        $categoryId = $this->input->post('category_id');
+        $categoryId = empty($categoryId) ? NULL : $categoryId;
+
+        $timeline = $this->input->post('timeline');
+        $timeline = empty($timeline) ? NULL : $timeline;
+
+        $this->Master_informasi_model->save([
+            'name' => $this->input->post('name'),
+            'category_id' => $categoryId,
+            'timeline' => $timeline,
+            'tautan' => $this->input->post('tautan')
         ]);
 
-        $date = $this->input->post('activity_date');
-        $year = date('Y', strtotime($date));
-        $month = (int)date('m', strtotime($date));
-        $triwulan = ceil($month / 3);
-
-        session()->setFlashdata('success', 'Laporan monitoring berhasil ditambahkan.');
-        redirect("monitoring?year={$year}&triwulan={$triwulan}");
+        session()->setFlashdata('success', 'Informasi master berhasil ditambahkan ke seluruh triwulan.');
+        redirect('monitoring');
     }
 
-    public function edit($id) {
+    public function edit($master_id, $year, $triwulan) {
+        $masterModel = $this->Master_informasi_model;
+        $masterInfo = $masterModel->find($master_id);
+        
+        if (!$masterInfo) {
+            session()->setFlashdata('error', 'Informasi Master tidak ditemukan.');
+            redirect('monitoring');
+        }
+
         $monitoringModel = $this->Monitoring_model;
-        $monitoring = $monitoringModel->find($id);
+        $monitoring = $monitoringModel->where('master_id', $master_id)
+                                      ->where('year', $year)
+                                      ->where('triwulan', $triwulan)
+                                      ->where('is_deleted', 0)
+                                      ->first();
 
-        if (!$monitoring) {
-            session()->setFlashdata('error', 'Data monitoring tidak ditemukan.');
+        if ($monitoring && session()->get('role') === 'karyawan' && $monitoring['created_by'] != session()->get('id')) {
+            session()->setFlashdata('error', 'Akses ditolak. Laporan ini diupdate oleh user lain.');
             redirect('monitoring');
         }
 
-        // Access Control: Karyawan can only edit their own reports
-        if (session()->get('role') === 'karyawan' && $monitoring['created_by'] != session()->get('id')) {
-            session()->setFlashdata('error', 'Akses ditolak. Anda hanya dapat mengedit laporan yang Anda buat sendiri.');
-            redirect('monitoring');
-        }
-
-        $categoryModel = $this->Category_model;
-        $data['categories'] = $categoryModel->orderBy('name', 'ASC')->findAll();
+        $data['masterInfo'] = $masterInfo;
         $data['monitoring'] = $monitoring;
-        $data['title'] = 'Edit Laporan Monitoring';
+        $data['year'] = $year;
+        $data['triwulan'] = $triwulan;
+        $data['title'] = 'Update Status Monitoring';
         
         $data['content_view'] = 'monitoring/form';
         $this->load->view('layouts/admin', $data);
     }
 
-    public function update($id) {
-        $monitoringModel = $this->Monitoring_model;
-        $monitoring = $monitoringModel->find($id);
-
-        if (!$monitoring) {
-            session()->setFlashdata('error', 'Data monitoring tidak ditemukan.');
+    public function update($master_id, $year, $triwulan) {
+        $masterModel = $this->Master_informasi_model;
+        $masterInfo = $masterModel->find($master_id);
+        
+        if (!$masterInfo) {
+            session()->setFlashdata('error', 'Informasi Master tidak ditemukan.');
             redirect('monitoring');
         }
 
-        // Access Control
-        if (session()->get('role') === 'karyawan' && $monitoring['created_by'] != session()->get('id')) {
+        $monitoringModel = $this->Monitoring_model;
+        $monitoring = $monitoringModel->where('master_id', $master_id)
+                                      ->where('year', $year)
+                                      ->where('triwulan', $triwulan)
+                                      ->where('is_deleted', 0)
+                                      ->first();
+
+        if ($monitoring && session()->get('role') === 'karyawan' && $monitoring['created_by'] != session()->get('id')) {
             session()->setFlashdata('error', 'Akses ditolak.');
             redirect('monitoring');
         }
 
-        $this->form_validation->set_rules('title', 'Judul', 'required|min_length[5]|max_length[255]');
-        $this->form_validation->set_rules('category_id', 'Kategori', 'required');
-        $this->form_validation->set_rules('description', 'Deskripsi', 'required|min_length[10]');
-        $this->form_validation->set_rules('activity_date', 'Tanggal Pelaksanaan', 'required|regex_match[/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/]');
         $this->form_validation->set_rules('status', 'Status', 'required|in_list[pending,progress,completed]');
-
+        $this->form_validation->set_rules('custom_name', 'Nama Informasi', 'required');
+        
         if ($this->form_validation->run() === FALSE) {
-            session()->setFlashdata('error', 'Validasi gagal.');
-            redirect("monitoring/edit/{$id}");
+            session()->setFlashdata('error', 'Validasi gagal. Pastikan form terisi dengan benar.');
+            redirect("monitoring/edit/{$master_id}/{$year}/{$triwulan}");
         }
 
-        $monitoringModel->update($id, [
-            'title'         => $this->input->post('title'),
-            'category_id'   => $this->input->post('category_id'),
-            'description'   => $this->input->post('description'),
-            'status'        => $this->input->post('status'),
-            'activity_date' => $this->input->post('activity_date'),
-        ]);
+        $customName = $this->input->post('custom_name');
+        // If custom name matches master name exactly, we can just store NULL to save space
+        if ($customName === $masterInfo['name']) {
+            $customName = NULL;
+        }
 
-        $date = $this->input->post('activity_date');
-        $year = date('Y', strtotime($date));
-        $month = (int)date('m', strtotime($date));
-        $triwulan = ceil($month / 3);
+        $saveData = [
+            'master_id'   => $master_id,
+            'year'        => $year,
+            'triwulan'    => $triwulan,
+            'custom_name' => $customName,
+            'status'      => $this->input->post('status'),
+            'description' => $this->input->post('description'),
+            'pj'          => $this->input->post('pj'),
+            'is_deleted'  => 0
+        ];
 
-        session()->setFlashdata('success', 'Laporan monitoring berhasil diperbarui.');
+        if ($monitoring) {
+            $monitoringModel->update($monitoring['id'], $saveData);
+        } else {
+            $saveData['created_by'] = session()->get('id');
+            $monitoringModel->save($saveData);
+        }
+
+        session()->setFlashdata('success', 'Status monitoring berhasil diperbarui.');
         redirect("monitoring?year={$year}&triwulan={$triwulan}");
     }
 
-    public function delete($id) {
-        $monitoringModel = $this->Monitoring_model;
-        $monitoring = $monitoringModel->find($id);
-
-        if (!$monitoring) {
-            session()->setFlashdata('error', 'Data monitoring tidak ditemukan.');
-            redirect('monitoring');
-        }
-
-        // Access Control
-        if (session()->get('role') === 'karyawan' && $monitoring['created_by'] != session()->get('id')) {
-            session()->setFlashdata('error', 'Akses ditolak.');
-            redirect('monitoring');
-        }
-
-        $date = $monitoring['activity_date'];
-        $year = date('Y', strtotime($date));
-        $month = (int)date('m', strtotime($date));
-        $triwulan = ceil($month / 3);
-
-        $monitoringModel->delete($id);
+    public function delete($master_id, $year, $triwulan) {
+        $masterModel = $this->Master_informasi_model;
+        $masterInfo = $masterModel->find($master_id);
         
-        session()->setFlashdata('success', 'Laporan monitoring berhasil dihapus.');
+        if (!$masterInfo) {
+            session()->setFlashdata('error', 'Informasi Master tidak ditemukan.');
+            redirect("monitoring?year={$year}&triwulan={$triwulan}");
+        }
+
+        $monitoringModel = $this->Monitoring_model;
+        $monitoring = $monitoringModel->where('master_id', $master_id)
+                                      ->where('year', $year)
+                                      ->where('triwulan', $triwulan)
+                                      ->first();
+
+        if ($monitoring && session()->get('role') === 'karyawan' && $monitoring['created_by'] != session()->get('id')) {
+            session()->setFlashdata('error', 'Akses ditolak.');
+            redirect("monitoring?year={$year}&triwulan={$triwulan}");
+        }
+
+        if ($monitoring) {
+            $monitoringModel->update($monitoring['id'], ['is_deleted' => 1]);
+        } else {
+            // If it never existed, create a deleted marker
+            $saveData = [
+                'master_id'   => $master_id,
+                'year'        => $year,
+                'triwulan'    => $triwulan,
+                'created_by'  => session()->get('id'),
+                'is_deleted'  => 1
+            ];
+            $monitoringModel->save($saveData);
+        }
+
+        session()->setFlashdata('success', "Informasi berhasil dihapus dari Triwulan {$triwulan}.");
         redirect("monitoring?year={$year}&triwulan={$triwulan}");
     }
 }

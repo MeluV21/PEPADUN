@@ -33,6 +33,15 @@ class MY_Model extends CI_Model {
         return $this;
     }
 
+    public function orWhere($key, $value = NULL) {
+        if (is_array($key)) {
+            $this->db->or_where($key);
+        } else {
+            $this->db->or_where($key, $value);
+        }
+        return $this;
+    }
+
     public function groupStart() {
         $this->db->group_start();
         return $this;
@@ -63,9 +72,9 @@ class MY_Model extends CI_Model {
         return $this;
     }
 
-    public function countAllResults() {
-        // count_all_results clears the active record caches, so it's a terminal query
-        return $this->db->count_all_results($this->table);
+    public function countAllResults($reset = TRUE) {
+        // count_all_results clears the active record caches by default, pass FALSE to keep them
+        return $this->db->count_all_results($this->table, $reset);
     }
 
     public function find($id) {
