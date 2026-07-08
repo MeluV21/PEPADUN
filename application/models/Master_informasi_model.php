@@ -1,10 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Monitoring_model extends MY_Model {
-    protected $table            = 'monitoring';
+class Master_informasi_model extends MY_Model {
+    protected $table            = 'master_informasi';
     protected $primaryKey       = 'id';
-    protected $allowedFields    = ['master_id', 'triwulan', 'year', 'custom_name', 'description', 'status', 'pj', 'created_by', 'is_deleted'];
+    protected $allowedFields    = ['name', 'category_id', 'timeline', 'tautan'];
     protected $useTimestamps    = TRUE;
     protected $createdField     = 'created_at';
     protected $updatedField     = 'updated_at';

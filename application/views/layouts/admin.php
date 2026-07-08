@@ -64,8 +64,6 @@
                 </div>
             </main>
 
-            <!-- Footer Partial View -->
-            <?php $this->load->view('layouts/footer'); ?>
         </div>
     </div>
 </body>

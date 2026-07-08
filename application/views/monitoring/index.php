@@ -47,7 +47,7 @@
 
             <!-- Right side: Actions (Add Data & Exports) on the same line -->
             <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                <a href="<?= base_url('monitoring/create') ?>" class="btn btn-primary" style="background-color: #0c3d79; border-color: #0c3d79; padding: 0.5rem 1.25rem; font-size: 0.85rem;">
+                <a href="<?= base_url('monitoring/create_master') ?>" class="btn btn-primary" style="background-color: #0c3d79; border-color: #0c3d79; padding: 0.5rem 1.25rem; font-size: 0.85rem;">
                     <i class="bi bi-plus-lg"></i> Tambah Data
                 </a>
                 <button type="button" class="btn btn-export-excel" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;" onclick="alert('Export Excel berhasil diunduh.')">
@@ -69,12 +69,12 @@
                 <th style="width: 5%;">No.</th>
                 <th style="width: 25%;">Nama Informasi</th>
                 <th style="width: 12%;">Kategori</th>
-                <th style="width: 13%;">Status</th>
                 <th style="width: 12%;">PJ</th>
-                <th style="width: 12%;">Timeline</th>
+                <th style="width: 10%;">Timeline</th>
+                <th style="width: 13%;">Status</th>
                 <th style="width: 12%;">Keterangan</th>
-                <th style="width: 4%; text-align: center;">Tautan</th>
-                <th style="width: 10%; text-align: right;">Aksi</th>
+                <th style="width: 6%; text-align: center;">Tautan</th>
+                <th style="width: 5%; text-align: right;">Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -87,9 +87,13 @@
             <?php else: ?>
                 <?php foreach ($monitoringList as $index => $item): ?>
                     <tr>
-                        <td><?= $index + 1 ?></td>
-                        <td style="font-weight: 600; color: var(--text-dark);"><?= esc($item['title']) ?></td>
-                        <td><?= esc($item['category_name']) ?></td>
+                        <td><?= $index + 1 + (($currentPage - 1) * $perPage) ?></td>
+                        <td style="font-weight: 600; color: var(--text-dark);"><?= esc($item['custom_name'] ?: $item['name']) ?></td>
+                        <td><?= esc($item['category_name'] ?: '-') ?></td>
+                        <td style="font-weight: 500;"><?= esc($item['pj'] ?: '-') ?></td>
+                        <td style="color: var(--text-dark); font-size: 0.85rem; font-weight: 500;">
+                            <?= esc($item['timeline'] ?: '-') ?>
+                        </td>
                         <td>
                             <?php if ($item['status'] === 'completed'): ?>
                                 <span class="badge badge-selesai">
@@ -105,33 +109,33 @@
                                 </span>
                             <?php endif; ?>
                         </td>
-                        <td style="font-weight: 500;"><?= esc($item['reporter_name']) ?></td>
-                        <td style="color: var(--text-muted); font-size: 0.8rem;">
-                            <?= date('d M Y H:i', strtotime($item['created_at'])) ?>
-                        </td>
                         <td style="color: var(--text-muted); font-size: 0.8rem;"><?= esc($item['description'] ?: '-') ?></td>
                         <td style="text-align: center;">
-                            <a href="#" class="btn-tertiary" title="Buka tautan dokumen" style="padding: 0; font-size: 1.15rem; color: var(--primary);">
-                                <i class="bi bi-link-45deg"></i>
-                            </a>
+                            <?php if (!empty($item['tautan'])): ?>
+                                <a href="<?= esc($item['tautan']) ?>" target="_blank" class="btn-tertiary" title="Buka tautan dokumen" style="padding: 0; font-size: 1.15rem; color: var(--primary);">
+                                    <i class="bi bi-link-45deg"></i>
+                                </a>
+                            <?php else: ?>
+                                <span style="color: var(--text-muted); font-size: 0.8rem;">-</span>
+                            <?php endif; ?>
                         </td>
                         <td style="text-align: right; white-space: nowrap;">
                             <?php 
                                 $canModify = false;
-                                if (session()->get('role') === 'admin' || $item['created_by'] == session()->get('id')) {
+                                if (session()->get('role') === 'admin' || $item['created_by'] == session()->get('id') || !$item['created_by']) {
                                     $canModify = true;
                                 }
                             ?>
                             <div style="display: inline-flex; gap: 0.35rem; align-items: center; vertical-align: middle;">
                                 <?php if ($canModify): ?>
-                                    <a href="<?= base_url('monitoring/edit/' . $item['id']) ?>" class="btn btn-secondary btn-sm" title="Edit Laporan" style="padding: 0.25rem 0.45rem; font-size: 0.85rem; background-color: #EAF2FF; border-color: #3882F6; color: #0A4D9E;">
-                                        <i class="bi bi-pencil"></i>
+                                    <a href="<?= base_url("monitoring/edit/{$item['id']}/{$selectedYear}/{$selectedTriwulan}") ?>" class="btn btn-secondary btn-sm" title="Update Status" style="padding: 0.25rem 0.45rem; font-size: 0.85rem; background-color: #EAF2FF; border-color: #3882F6; color: #0A4D9E;">
+                                        <i class="bi bi-pencil"></i> Update
                                     </a>
-                                    <a href="<?= base_url('monitoring/delete/' . $item['id']) ?>" class="btn btn-danger btn-sm" title="Hapus Laporan" onclick="return confirm('Apakah Anda yakin ingin menghapus laporan monitoring ini?')" style="padding: 0.25rem 0.45rem; font-size: 0.85rem; background-color: #FEF2F2; border-color: #FCA5A5; color: #EF4444;">
+                                    <a href="<?= base_url("monitoring/delete/{$item['id']}/{$selectedYear}/{$selectedTriwulan}") ?>" class="btn btn-danger btn-sm" title="Hapus dari Triwulan ini" onclick="return confirm('Yakin ingin menyembunyikan laporan ini dari Triwulan <?= $selectedTriwulan ?>?')" style="padding: 0.25rem 0.45rem; font-size: 0.85rem; background-color: #FEF2F2; border-color: #FCA5A5; color: #EF4444;">
                                         <i class="bi bi-trash3"></i>
                                     </a>
                                 <?php else: ?>
-                                    <span style="font-size: 0.8rem; color: var(--text-disabled); font-style: italic; margin-right: 0.5rem;" title="Terkunci: Laporan milik pengguna lain">
+                                    <span style="font-size: 0.8rem; color: var(--text-disabled); font-style: italic; margin-right: 0.5rem;" title="Terkunci: Diubah oleh pengguna lain">
                                         <i class="bi bi-lock-fill"></i>
                                     </span>
                                 <?php endif; ?>
@@ -147,42 +151,61 @@
     </table>
 </div>
 
-<!-- Pagination UI matching Mockup -->
-<div class="pagination-wrapper">
+<!-- Pagination UI -->
+<?php if ($totalRows > 0): ?>
+    <?php
+        $startItem = (($currentPage - 1) * $perPage) + 1;
+        $endItem = min($currentPage * $perPage, $totalRows);
+        
+        $build_page_url = function($p) use ($perPage) {
+            $ci =& get_instance();
+            $params = $ci->input->get();
+            $params['page'] = $p;
+            $params['per_page'] = $perPage;
+            return base_url('monitoring') . '?' . http_build_query($params);
+        };
+    ?>
+<div class="pagination-wrapper" style="justify-content: space-between;">
     <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500;">
-        Menampilkan 1 - 10 dari 120 data
+        Menampilkan <?= $startItem ?> - <?= $endItem ?> dari <?= $totalRows ?> data
     </div>
     
     <div class="pagination-pages">
-        <button class="pagination-page-btn" title="First Page">
+        <a href="<?= $build_page_url(1) ?>" class="pagination-page-btn" title="First Page" <?= $currentPage <= 1 ? 'style="pointer-events:none; opacity:0.5;"' : '' ?>>
             <i class="bi bi-chevron-double-left"></i>
-        </button>
-        <button class="pagination-page-btn" title="Previous Page">
+        </a>
+        <a href="<?= $build_page_url(max(1, $currentPage - 1)) ?>" class="pagination-page-btn" title="Previous Page" <?= $currentPage <= 1 ? 'style="pointer-events:none; opacity:0.5;"' : '' ?>>
             <i class="bi bi-chevron-left"></i>
-        </button>
-        <button class="pagination-page-btn active">1</button>
-        <button class="pagination-page-btn">2</button>
-        <button class="pagination-page-btn">3</button>
-        <button class="pagination-page-btn">4</button>
-        <button class="pagination-page-btn">5</button>
-        <button class="pagination-page-btn" disabled style="cursor: default; border-color: transparent;">...</button>
-        <button class="pagination-page-btn">12</button>
-        <button class="pagination-page-btn" title="Next Page">
+        </a>
+        
+        <?php
+            $startPage = max(1, $currentPage - 2);
+            $endPage = min($totalPages, $currentPage + 2);
+            if ($startPage > 1) echo '<button class="pagination-page-btn" disabled style="cursor: default; border-color: transparent;">...</button>';
+            for ($p = $startPage; $p <= $endPage; $p++) {
+                $activeClass = $p === $currentPage ? 'active' : '';
+                echo '<a href="'.$build_page_url($p).'" class="pagination-page-btn '.$activeClass.'" style="text-decoration:none;">'.$p.'</a>';
+            }
+            if ($endPage < $totalPages) echo '<button class="pagination-page-btn" disabled style="cursor: default; border-color: transparent;">...</button>';
+        ?>
+        
+        <a href="<?= $build_page_url(min($totalPages, $currentPage + 1)) ?>" class="pagination-page-btn" title="Next Page" <?= $currentPage >= $totalPages ? 'style="pointer-events:none; opacity:0.5;"' : '' ?>>
             <i class="bi bi-chevron-right"></i>
-        </button>
-        <button class="pagination-page-btn" title="Last Page">
+        </a>
+        <a href="<?= $build_page_url($totalPages) ?>" class="pagination-page-btn" title="Last Page" <?= $currentPage >= $totalPages ? 'style="pointer-events:none; opacity:0.5;"' : '' ?>>
             <i class="bi bi-chevron-double-right"></i>
-        </button>
+        </a>
     </div>
     
     <div>
-        <select class="select-control" style="padding: 0.35rem 2rem 0.35rem 0.75rem; min-width: 130px; font-size: 0.8rem; border-radius: var(--br-6);">
-            <option>10 / halaman</option>
-            <option>25 / halaman</option>
-            <option>50 / halaman</option>
+        <select class="select-control" id="perPageSelect" style="padding: 0.35rem 2rem 0.35rem 0.75rem; min-width: 130px; font-size: 0.8rem; border-radius: var(--br-6);">
+            <option value="10" <?= $perPage == 10 ? 'selected' : '' ?>>10 / halaman</option>
+            <option value="25" <?= $perPage == 25 ? 'selected' : '' ?>>25 / halaman</option>
+            <option value="50" <?= $perPage == 50 ? 'selected' : '' ?>>50 / halaman</option>
         </select>
     </div>
 </div>
+<?php endif; ?>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -218,6 +241,16 @@
         if (searchIcon && searchInput) {
             searchIcon.addEventListener('click', function() {
                 searchInput.form.submit();
+            });
+        }
+        
+        const perPageSelect = document.getElementById('perPageSelect');
+        if (perPageSelect) {
+            perPageSelect.addEventListener('change', function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('per_page', this.value);
+                urlParams.set('page', '1');
+                window.location.search = urlParams.toString();
             });
         }
     });
