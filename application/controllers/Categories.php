@@ -10,6 +10,15 @@ class Categories extends Admin_Controller {
 
     public function index() {
         $categoryModel = $this->Category_model;
+        
+        $search = $this->input->get('search');
+        
+        if (!empty($search)) {
+            $categoryModel->like('name', $search);
+            $categoryModel->or_like('description', $search);
+        }
+        
+        $data['searchQuery'] = $search;
         $data['categories'] = $categoryModel->orderBy('name', 'ASC')->findAll();
         $data['title'] = 'Manajemen Kategori';
         $data['content_view'] = 'categories/index';

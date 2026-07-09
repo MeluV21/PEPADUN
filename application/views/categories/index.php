@@ -1,8 +1,28 @@
-<div class="page-header">
-    <h2>Manajemen Kategori</h2>
-    <button class="btn btn-primary" onclick="openAddModal()">
-        <i class="bi bi-plus-lg"></i> Tambah Kategori
-    </button>
+<!-- Header Action Card -->
+<div class="card" style="margin-bottom: 2rem; padding: 1rem 1.25rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <!-- Left side: Search Filter -->
+        <form action="<?= base_url('categories') ?>" method="GET" style="margin: 0; flex: 1; max-width: 300px;">
+            <div style="position: relative; width: 100%;">
+                <input type="text" name="search" class="form-control" placeholder="Cari kategori..." value="<?= isset($searchQuery) ? esc($searchQuery) : '' ?>" autocomplete="off" style="padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.85rem; padding-right: 2.5rem; width: 100%;">
+                <button type="submit" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 0; margin: 0; outline: none; cursor: pointer; color: var(--text-muted);">
+                    <i class="bi bi-search" style="font-size: 0.95rem;"></i>
+                </button>
+            </div>
+        </form>
+
+        <!-- Right side: Actions -->
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <?php if (!empty($searchQuery)): ?>
+                <a href="<?= base_url('categories') ?>" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    Reset
+                </a>
+            <?php endif; ?>
+            <button type="button" class="btn btn-primary" onclick="openAddModal()" style="background-color: #0c3d79; border-color: #0c3d79; padding: 0.5rem 1.25rem; font-size: 0.85rem;">
+                <i class="bi bi-plus-lg"></i> Tambah Kategori
+            </button>
+        </div>
+    </div>
 </div>
 
 <!-- Table Container -->
@@ -13,13 +33,16 @@
                 <th style="width: 10%;">No.</th>
                 <th style="width: 25%;">Nama Kategori</th>
                 <th style="width: 45%;">Deskripsi Kategori</th>
-                <th style="width: 20%; text-align: right;">Aksi</th>
+                <th style="width: 15%; text-align: center;">Aksi</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($categories)): ?>
                 <tr>
-                    <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Belum ada kategori yang terdaftar.</td>
+                    <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 4rem 2rem;">
+                        <i class="bi bi-folder-x" style="font-size: 3rem; color: #cbd5e1; display: block; margin-bottom: 1rem;"></i>
+                        Belum ada kategori yang terdaftar.
+                    </td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($categories as $index => $cat): ?>
@@ -27,13 +50,13 @@
                         <td style="font-weight: 500; color: var(--text-muted);"><?= $index + 1 ?></td>
                         <td style="font-weight: 600; color: var(--text-dark);"><?= esc($cat['name']) ?></td>
                         <td style="color: var(--text-muted);"><?= esc($cat['description'] ?: '-') ?></td>
-                        <td style="text-align: right;">
-                            <div class="btn-group" style="justify-content: flex-end;">
-                                <button class="btn btn-secondary btn-sm" onclick="openEditModal(<?= esc($cat['id']) ?>, '<?= addslashes(esc($cat['name'])) ?>', '<?= addslashes(esc($cat['description'] ?: '')) ?>')">
-                                    <i class="bi bi-pencil-square"></i> Edit
+                        <td style="text-align: center; white-space: nowrap;">
+                            <div style="display: inline-flex; gap: 0.75rem; align-items: center; vertical-align: middle;">
+                                <button type="button" onclick="openEditModal(<?= esc($cat['id']) ?>, '<?= addslashes(esc($cat['name'])) ?>', '<?= addslashes(esc($cat['description'] ?: '')) ?>')" title="Edit Kategori" style="border: none; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #F0F5FF; color: #2563EB; border-radius: 10px; transition: all 0.2s;">
+                                    <i class="bi bi-pencil"></i>
                                 </button>
-                                <a href="<?= base_url('categories/delete/' . $cat['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini? Data monitoring terkait mungkin terdampak.')" style="background-color: transparent; color: var(--danger); border-color: var(--danger);">
-                                    <i class="bi bi-trash3"></i> Hapus
+                                <a href="<?= base_url('categories/delete/' . $cat['id']) ?>" title="Hapus Kategori" onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini? Data monitoring terkait mungkin terdampak.')" style="display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #FFF0F0; color: #EF4444; border-radius: 10px; text-decoration: none; transition: all 0.2s;">
+                                    <i class="bi bi-trash"></i>
                                 </a>
                             </div>
                         </td>

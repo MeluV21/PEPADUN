@@ -126,8 +126,8 @@ class Monitoring extends Auth_Controller {
         $this->form_validation->set_rules('tautan', 'Tautan', 'required');
 
         if ($this->form_validation->run() === FALSE) {
-            session()->setFlashdata('error', 'Validasi gagal. Pastikan form terisi benar.');
-            redirect('monitoring/create_master');
+            session()->setFlashdata('error', 'Validasi gagal. Pastikan form terisi dengan benar (Nama min. 3 karakter).');
+            redirect('monitoring');
         }
 
         $categoryId = $this->input->post('category_id');
@@ -204,7 +204,7 @@ class Monitoring extends Auth_Controller {
         
         if ($this->form_validation->run() === FALSE) {
             session()->setFlashdata('error', 'Validasi gagal. Pastikan form terisi dengan benar.');
-            redirect("monitoring/edit/{$master_id}/{$year}/{$triwulan}");
+            redirect("monitoring?year={$year}&triwulan={$triwulan}");
         }
 
         $customName = $this->input->post('custom_name');

@@ -12,11 +12,17 @@
     .modal-content { max-width: 800px !important; width: 90% !important; max-height: 90vh; overflow-y: auto; }
 </style>
 
-<div class="page-header">
-    <h2>Data Karyawan</h2>
-    <button class="btn btn-primary" onclick="openAddModal()">
-        <i class="bi bi-person-plus-fill"></i> Tambah Data
-    </button>
+<!-- Header Action Card -->
+<div class="card" style="margin-bottom: 2rem; padding: 1rem 1.25rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <!-- Left side: Title -->
+        <h2 style="font-weight: 700; color: var(--primary); margin: 0; font-size: 1.25rem;">Data Karyawan</h2>
+
+        <!-- Right side: Actions -->
+        <button type="button" class="btn btn-primary" onclick="openAddModal()" style="background-color: #0c3d79; border-color: #0c3d79; padding: 0.5rem 1.25rem; font-size: 0.85rem;">
+            <i class="bi bi-person-plus-fill"></i> Tambah Data
+        </button>
+    </div>
 </div>
 
 <div class="table-responsive" style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
@@ -62,7 +68,7 @@
                 <th>Kontrak Awal</th>
                 <th>Kontrak Akhir</th>
                 <th>Role Akses</th>
-                <th>Aksi</th>
+                <th style="text-align: center;">Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -107,18 +113,18 @@
                     <td><?= esc($user['kontrak_awal'] ?: '-') ?></td>
                     <td><?= esc($user['kontrak_akhir'] ?: '-') ?></td>
                     <td><?= esc($user['role'] ?: '-') ?></td>
-                    <td>
-                        <div class="btn-group" style="justify-content: flex-start;">
-                            <button class="btn btn-secondary btn-sm" onclick='openEditModal(<?= json_encode($user) ?>)'>
-                                <i class="bi bi-pencil-square"></i> Edit
+                    <td style="text-align: center; white-space: nowrap;">
+                        <div style="display: inline-flex; gap: 0.75rem; align-items: center; vertical-align: middle;">
+                            <button type="button" onclick='openEditModal(<?= htmlspecialchars(json_encode($user), ENT_QUOTES, "UTF-8") ?>)' title="Edit Karyawan" style="border: none; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #F0F5FF; color: #2563EB; border-radius: 10px; transition: all 0.2s;">
+                                <i class="bi bi-pencil"></i>
                             </button>
                             <?php if (session()->get('id') != $user['id']): ?>
-                                <a href="<?= base_url('users/delete/' . $user['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?')" style="background-color: transparent; color: var(--danger); border-color: var(--danger);">
-                                    <i class="bi bi-trash3"></i> Hapus
+                                <a href="<?= base_url('users/delete/' . $user['id']) ?>" title="Hapus Karyawan" onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?')" style="display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #FFF0F0; color: #EF4444; border-radius: 10px; text-decoration: none; transition: all 0.2s;">
+                                    <i class="bi bi-trash"></i>
                                 </a>
                             <?php else: ?>
-                                <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.4;" title="Tidak dapat menghapus akun sendiri">
-                                    <i class="bi bi-trash3"></i> Hapus
+                                <button type="button" disabled style="border: none; display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #f1f5f9; color: #94a3b8; border-radius: 10px; cursor: not-allowed;" title="Tidak dapat menghapus akun sendiri">
+                                    <i class="bi bi-trash"></i>
                                 </button>
                             <?php endif; ?>
                         </div>

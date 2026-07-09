@@ -33,7 +33,7 @@
                 </div>
 
                 <!-- Category filter dropdown -->
-                <select id="category" name="category" class="select-control" style="width: 170px; padding: 0.5rem 2rem 0.5rem 0.75rem; font-size: 0.85rem;">
+                <select id="category" name="category" class="select-control" style="width: 170px; padding: 0.5rem 2.5rem 0.5rem 0.75rem; font-size: 0.85rem;">
                     <option value="">Semua Kategori</option>
                     <?php foreach ($categories as $cat): 
                         if (strtolower(trim($cat['name'])) === 'tanpa kategori') continue;
@@ -42,6 +42,14 @@
                             <?= esc($cat['name']) ?>
                         </option>
                     <?php endforeach; ?>
+                </select>
+
+                <!-- Status filter dropdown -->
+                <select id="status" name="status" class="select-control" style="width: 170px; padding: 0.5rem 2.5rem 0.5rem 0.75rem; font-size: 0.85rem;">
+                    <option value="">Semua Status</option>
+                    <option value="pending" <?= ($selectedStatus == 'pending') ? 'selected' : '' ?>>❌ Belum Update</option>
+                    <option value="progress" <?= ($selectedStatus == 'progress') ? 'selected' : '' ?>>⏳ Dalam Proses</option>
+                    <option value="completed" <?= ($selectedStatus == 'completed') ? 'selected' : '' ?>>✅ Selesai (Completed)</option>
                 </select>
                 
                 <!-- Action buttons for filtering -->
@@ -57,9 +65,9 @@
 
             <!-- Right side: Actions (Add Data & Exports) on the same line -->
             <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                <a href="<?= base_url('monitoring/create_master') ?>" class="btn btn-primary" style="background-color: #0c3d79; border-color: #0c3d79; padding: 0.5rem 1.25rem; font-size: 0.85rem;">
+                <button type="button" class="btn btn-primary" onclick="openTambahModal()" style="background-color: #0c3d79; border-color: #0c3d79; padding: 0.5rem 1.25rem; font-size: 0.85rem;">
                     <i class="bi bi-plus-lg"></i> Tambah Data
-                </a>
+                </button>
                 <button type="button" class="btn btn-export-excel" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;" onclick="alert('Export Excel berhasil diunduh.')">
                     <i class="bi bi-file-earmark-excel"></i> Export Excel
                 </button>
@@ -84,7 +92,7 @@
                 <th style="width: 13%;">Status</th>
                 <th style="width: 12%;">Keterangan</th>
                 <th style="width: 6%; text-align: center;">Tautan</th>
-                <th style="width: 5%; text-align: right;">Aksi</th>
+                <th style="width: 8%; text-align: center;">Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -129,29 +137,26 @@
                                 <span style="color: var(--text-muted); font-size: 0.8rem;">-</span>
                             <?php endif; ?>
                         </td>
-                        <td style="text-align: right; white-space: nowrap;">
+                        <td style="text-align: center; white-space: nowrap;">
                             <?php 
                                 $canModify = false;
                                 if (session()->get('role') === 'admin' || $item['created_by'] == session()->get('id') || !$item['created_by']) {
                                     $canModify = true;
                                 }
                             ?>
-                            <div style="display: inline-flex; gap: 0.35rem; align-items: center; vertical-align: middle;">
+                            <div style="display: inline-flex; gap: 0.75rem; align-items: center; vertical-align: middle;">
                                 <?php if ($canModify): ?>
-                                    <a href="<?= base_url("monitoring/edit/{$item['id']}/{$selectedYear}/{$selectedTriwulan}") ?>" class="btn btn-secondary btn-sm" title="Update Status" style="padding: 0.25rem 0.45rem; font-size: 0.85rem; background-color: #EAF2FF; border-color: #3882F6; color: #0A4D9E;">
-                                        <i class="bi bi-pencil"></i> Update
-                                    </a>
-                                    <a href="<?= base_url("monitoring/delete/{$item['id']}/{$selectedYear}/{$selectedTriwulan}") ?>" class="btn btn-danger btn-sm" title="Hapus dari Triwulan ini" onclick="return confirm('Yakin ingin menyembunyikan laporan ini dari Triwulan <?= $selectedTriwulan ?>?')" style="padding: 0.25rem 0.45rem; font-size: 0.85rem; background-color: #FEF2F2; border-color: #FCA5A5; color: #EF4444;">
-                                        <i class="bi bi-trash3"></i>
+                                    <button type="button" onclick="openEditModal(<?= $item['id'] ?>, <?= $selectedYear ?>, <?= $selectedTriwulan ?>, '<?= addslashes(esc($item['custom_name'] ?: $item['name'])) ?>', '<?= addslashes(esc($item['status'] ?: 'pending')) ?>', '<?= addslashes(esc($item['pj'] ?: '')) ?>', '<?= addslashes(esc(preg_replace("/\r|\n/", "\\n", $item['description'] ?: ''))) ?>')" title="Update Status" style="border: none; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #F0F5FF; color: #2563EB; border-radius: 10px; transition: all 0.2s;">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <a href="<?= base_url("monitoring/delete/{$item['id']}/{$selectedYear}/{$selectedTriwulan}") ?>" title="Hapus dari Triwulan ini" onclick="return confirm('Yakin ingin menyembunyikan laporan ini dari Triwulan <?= $selectedTriwulan ?>?')" style="display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #FFF0F0; color: #EF4444; border-radius: 10px; text-decoration: none; transition: all 0.2s;">
+                                        <i class="bi bi-trash"></i>
                                     </a>
                                 <?php else: ?>
-                                    <span style="font-size: 0.8rem; color: var(--text-disabled); font-style: italic; margin-right: 0.5rem;" title="Terkunci: Diubah oleh pengguna lain">
+                                    <span style="font-size: 0.85rem; color: var(--text-disabled); font-style: italic;" title="Terkunci: Diubah oleh pengguna lain">
                                         <i class="bi bi-lock-fill"></i>
                                     </span>
                                 <?php endif; ?>
-                                <button class="btn btn-sm" style="padding: 0.25rem 0.15rem; background: transparent; border: none; color: var(--text-muted); cursor: pointer;" title="Lainnya">
-                                    <i class="bi bi-three-dots-vertical" style="font-size: 0.95rem;"></i>
-                                </button>
                             </div>
                         </td>
                     </tr>
@@ -217,7 +222,157 @@
 </div>
 <?php endif; ?>
 
+<!-- Modal Tambah Data Global -->
+<div id="tambahDataModal" class="modal">
+  <div class="modal-content" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Tambah Informasi Global</h3>
+        <button type="button" class="modal-close" onclick="closeTambahModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+          Data yang ditambahkan di sini akan otomatis muncul di seluruh triwulan (Triwulan I sampai IV).
+        </p>
+        
+        <form action="<?= base_url('monitoring/store_master') ?>" method="POST">
+            <?= csrf_field() ?>
+            <div class="form-group">
+                <label for="add_name">Nama Informasi / Laporan <span style="color: red;">*</span></label>
+                <input type="text" id="add_name" name="name" class="form-control" placeholder="Tulis nama informasi atau laporan baru..." required autocomplete="off">
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem; align-items: flex-end;">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="add_category">Kategori <span style="color: red;">*</span></label>
+                    <select id="add_category" name="category_id" class="select-control" required style="background-position: right 1.25rem center; padding-right: 3rem;">
+                        <option value="">Pilih Kategori</option>
+                        <?php foreach ($categories as $cat): ?>
+                            <?php if (strtolower(trim($cat['name'])) !== 'tanpa kategori'): ?>
+                                <option value="<?= esc($cat['id']) ?>"><?= esc($cat['name']) ?></option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="add_timeline">Timeline Waktu <span style="color: red;">*</span></label>
+                    <select id="add_timeline" name="timeline" class="select-control" required style="background-position: right 1.25rem center; padding-right: 3rem;">
+                        <option value="">Pilih Timeline</option>
+                        <option value="Realtime">Realtime</option>
+                        <option value="Harian">Harian</option>
+                        <option value="Mingguan">Mingguan</option>
+                        <option value="Bulanan">Bulanan</option>
+                        <option value="Triwulan">Triwulan</option>
+                        <option value="Tahunan">Tahunan</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="add_tautan">Tautan / Link Dokumen <span style="color: red;">*</span></label>
+                <input type="text" id="add_tautan" name="tautan" class="form-control" placeholder="Contoh: https://link-dokumen.com" required autocomplete="off">
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeTambahModal()">Batal</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-device-hdd"></i> Simpan Data Global
+                </button>
+            </div>
+        </form>
+      </div>
+  </div>
+</div>
+
+<!-- Modal Update Status Monitoring -->
+<div id="editDataModal" class="modal">
+  <div class="modal-content" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Update Status Monitoring</h3>
+        <button type="button" class="modal-close" onclick="closeEditModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;" id="editModalSubtitle">
+          Mengupdate data untuk Triwulan
+        </p>
+        
+        <form id="editForm" action="" method="POST">
+            <?= csrf_field() ?>
+            <div class="form-group">
+                <label for="edit_custom_name">Nama Informasi / Laporan <span style="color: red;">*</span></label>
+                <input type="text" id="edit_custom_name" name="custom_name" class="form-control" required autocomplete="off">
+                <small style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.25rem; display: block;">Mengubah nama di sini hanya akan berlaku untuk Triwulan terpilih saja.</small>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem; align-items: flex-end;">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="edit_status">Status Perkembangan <span style="color: red;">*</span></label>
+                    <select id="edit_status" name="status" class="select-control" required style="background-position: right 1.25rem center; padding-right: 3rem;">
+                        <option value="pending">❌ Belum Update</option>
+                        <option value="progress">⏳ Dalam Proses</option>
+                        <option value="completed">✅ Selesai (Completed)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="edit_pj">Penanggung Jawab (PJ) (Opsional)</label>
+                    <input type="text" id="edit_pj" name="pj" class="form-control" placeholder="Tuliskan nama PJ..." autocomplete="off">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="edit_description">Deskripsi & Catatan Perkembangan (Opsional)</label>
+                <textarea id="edit_description" name="description" class="textarea-control" style="min-height: 100px;" placeholder="Tuliskan deskripsi atau catatan perkembangan..."></textarea>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Batal</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-lock"></i> Simpan Status
+                </button>
+            </div>
+        </form>
+      </div>
+  </div>
+</div>
+
 <script>
+    const tambahModal = document.getElementById('tambahDataModal');
+    const editModal = document.getElementById('editDataModal');
+    
+    function openEditModal(masterId, year, triwulan, customName, status, pj, desc) {
+        document.getElementById('editForm').action = `<?= base_url('monitoring/update') ?>/${masterId}/${year}/${triwulan}`;
+        document.getElementById('edit_custom_name').value = customName;
+        document.getElementById('edit_status').value = status || 'pending';
+        document.getElementById('edit_pj').value = pj || '';
+        document.getElementById('edit_description').value = desc || '';
+        
+        let triwulanRoman = triwulan == 1 ? 'I' : (triwulan == 2 ? 'II' : (triwulan == 3 ? 'III' : 'IV'));
+        document.getElementById('editModalSubtitle').innerHTML = `Mengupdate data untuk <strong style="color: #0c3d79;">Triwulan ${triwulanRoman} Tahun ${year}</strong>`;
+        
+        if(editModal) editModal.classList.add('show');
+    }
+    
+    function closeEditModal() {
+        if(editModal) editModal.classList.remove('show');
+    }
+    
+    function openTambahModal() {
+        if(tambahModal) tambahModal.classList.add('show');
+    }
+    
+    function closeTambahModal() {
+        if(tambahModal) tambahModal.classList.remove('show');
+    }
+    
+    // Close modal if clicked outside
+    window.addEventListener('click', function(event) {
+        if (event.target === tambahModal) {
+            closeTambahModal();
+        }
+        if (event.target === editModal) {
+            closeEditModal();
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         const searchInput = document.getElementById('search');
         const searchIcon = document.getElementById('searchIcon');
@@ -281,6 +436,19 @@
             
             // Allow Enter key to submit on select dropdown as well
             categorySelect.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.form.submit();
+                }
+            });
+        }
+        
+        const statusSelect = document.getElementById('status');
+        if (statusSelect) {
+            statusSelect.addEventListener('change', function() {
+                this.form.submit();
+            });
+            statusSelect.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     this.form.submit();
