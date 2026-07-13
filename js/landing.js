@@ -74,11 +74,13 @@ $(document).ready(function() {
             data: {
                 labels: initialLabels,
                 datasets: [{
-                    label: 'Kepatuhan',
+                    label: 'Presentase Kepatuhan',
                     data: initialData,
-                    backgroundColor: '#3882F6',
-                    borderRadius: 4,
-                    barThickness: 48
+                    backgroundColor: '#0A4D9E',
+                    hoverBackgroundColor: '#3882F6',
+                    borderRadius: 2,
+                    barPercentage: 0.7,
+                    categoryPercentage: 0.8
                 }]
             },
             options: {
@@ -101,34 +103,68 @@ $(document).ready(function() {
                         beginAtZero: true,
                         max: 100,
                         ticks: {
+                            stepSize: 20,
                             callback: function(value) {
                                 return value + '%';
                             },
                             font: {
                                 family: "'Poppins', sans-serif",
-                                size: 12
-                            }
+                                size: 11
+                            },
+                            color: '#64748B'
+                        },
+                        border: {
+                            dash: [5, 5],
+                            display: false
                         },
                         grid: {
-                            borderDash: [5, 5],
                             color: '#E2E8F0',
-                            drawBorder: false
+                            tickBorderDash: [5, 5],
+                            tickLength: 0
                         }
                     },
                     x: {
-                        ticks: {
-                            font: {
-                                family: "'Poppins', sans-serif",
-                                size: 12
-                            }
-                        },
                         grid: {
                             display: false,
                             drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                family: "'Poppins', sans-serif",
+                                size: 11
+                            },
+                            color: '#64748B',
+                            padding: 10
+                        },
+                        border: {
+                            display: true,
+                            color: '#E2E8F0'
                         }
                     }
+                },
+                layout: {
+                    padding: {
+                        top: 20
+                    }
                 }
-            }
+            },
+            plugins: [{
+                id: 'customDatalabels',
+                afterDatasetsDraw: function(chart, args, options) {
+                    const ctx = chart.ctx;
+                    chart.data.datasets.forEach((dataset, i) => {
+                        const meta = chart.getDatasetMeta(i);
+                        meta.data.forEach((bar, index) => {
+                            const data = dataset.data[index];
+                            ctx.fillStyle = '#0F172A';
+                            ctx.font = '500 11px "Poppins", sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+                            ctx.fillText(data + '%', bar.x, bar.y - 8);
+                        });
+                    });
+                }
+            }]
         });
     }
 

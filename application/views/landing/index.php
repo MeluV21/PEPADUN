@@ -173,15 +173,18 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
 <div class="row g-4 mt-4">
 
     <!-- CHART -->
-    <div class="col-lg-6">
-        <div class="wf-card dashboard-card">
-            <div class="card-header-custom d-flex justify-content-between align-items-center mb-4">
-                <h5 class="mb-0 fw-bold text-ds-primary" style="font-size: 18px;">
-                    Presentase Kepatuhan Per Kategori
-                </h5>
+    <div class="col-lg-12">
+        <div class="wf-card dashboard-card" style="padding: 1.75rem;">
+            <div class="card-header-custom d-flex justify-content-between align-items-center mb-4" style="padding-bottom: 1rem; border-bottom: 1px dashed var(--neutral-light, #E2E8F0);">
+                <div class="d-flex align-items-center gap-2 text-ds-primary" style="color: var(--primary, #0A4D9E);">
+                    <i class="bi bi-bar-chart-fill" style="font-size: 1.25rem;"></i>
+                    <h3 class="mb-0 fw-bold" style="font-size: 1.1rem; margin: 0;">
+                        Presentase Kepatuhan Per Kategori
+                    </h3>
+                </div>
             </div>
-            <div class="chart-scroll">
-                <div class="chart-wrapper">
+            <div class="chart-scroll" style="position: relative; height: 320px; width: 100%; overflow-x: auto;">
+                <div class="chart-wrapper" style="min-width: 600px; height: 100%;">
                     <canvas id="kepatuhanChart"></canvas>
                     <script>
                         window.kepatuhanChartData = <?= $chartData ?? '[]' ?>;
@@ -192,39 +195,70 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
     </div>
 
     <!-- ITEM BELUM UPDATE -->
-    <div class="col-lg-6">
-        <div class="wf-card dashboard-card">
+    <div class="col-lg-12">
+        <div class="wf-card dashboard-card" style="padding: 1.75rem;">
             <div class="card-header-custom d-flex justify-content-between align-items-center mb-4">
-                <h5 class="mb-0 fw-bold text-ds-primary" style="font-size: 18px;">
-                    Item Belum Update
-                </h5>
+                <div class="d-flex align-items-center gap-2 text-danger">
+                    <div style="background-color: var(--danger, #dc3545); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">!</div>
+                    <h3 class="mb-0 fw-bold" style="font-size: 1.1rem; margin: 0;">
+                        Item Belum Update
+                    </h3>
+                </div>
+
             </div>
 
-            <div class="item-scroll" id="containerBelumUpdate">
-                <?php
-                $belumUpdate = $belumUpdate ?? [
-                    ['judul'=>'Struktur Organisasi', 'kategori'=>'Profil PPID'],
-                    ['judul'=>'Registrasi Permintaan Informasi', 'kategori'=>'Laporan'],
-                    ['judul'=>'Laporan Keberatan', 'kategori'=>'Laporan'],
-                ];
-                ?>
+            <div class="table-responsive" id="containerBelumUpdate" style="max-height: 400px; overflow-y: auto;">
+                <table class="table custom-table table-hover" style="border-top: 1px dashed var(--neutral-light, #E2E8F0); min-width: 800px; margin-bottom: 0;">
+                    <thead style="position: sticky; top: 0; background: white; z-index: 1;">
+                        <tr>
+                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Item Informasi</th>
+                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Kategori</th>
+                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">PJ</th>
+                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Timeline</th>
+                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Keterangan</th>
+                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Tautan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $belumUpdate = $belumUpdate ?? [
+                            ['judul'=>'Struktur Organisasi', 'kategori'=>'Profil PPID', 'pj'=>'Subbag Tata Usaha', 'timeline'=>'Triwulan II', 'keterangan'=>'Belum diupload', 'tautan'=>'#'],
+                            ['judul'=>'Registrasi Permintaan Informasi', 'kategori'=>'Laporan', 'pj'=>'Subbag Tata Usaha', 'timeline'=>'Triwulan II', 'keterangan'=>'Menunggu verifikasi', 'tautan'=>'#'],
+                            ['judul'=>'Laporan Keberatan', 'kategori'=>'Laporan', 'pj'=>'Subbag Tata Usaha', 'timeline'=>'Triwulan II', 'keterangan'=>'-', 'tautan'=>'#'],
+                        ];
+                        ?>
 
-                <?php foreach($belumUpdate as $row): ?>
-                <div class="list-row-item py-3 border-bottom d-flex align-items-center">
-                    <div class="me-3">
-                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 18px;"></i>
-                    </div>
-                    <div class="title fw-semibold text-dark flex-grow-1" style="font-size: 14px;">
-                        <?= $row['judul']; ?>
-                    </div>
-                    <div class="text-secondary" style="font-size: 13px; width: 120px;">
-                        <?= $row['kategori']; ?>
-                    </div>
-                    <div class="text-end text-secondary" style="font-size: 13px; width: 30px;">
-                        -
-                    </div>
-                </div>
-                <?php endforeach; ?>
+                        <?php foreach($belumUpdate as $row): ?>
+                        <tr>
+                            <td style="padding: 1rem;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-exclamation-triangle text-danger" style="font-size: 1.1rem;"></i>
+                                    <span class="fw-medium text-dark" style="font-size: 0.9rem;">
+                                        <?= $row['judul']; ?>
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="text-secondary" style="font-size: 0.9rem; padding: 1rem;">
+                                <?= $row['kategori']; ?>
+                            </td>
+                            <td class="text-secondary" style="font-size: 0.9rem; padding: 1rem;">
+                                <?= isset($row['pj']) ? $row['pj'] : '-'; ?>
+                            </td>
+                            <td class="text-secondary" style="font-size: 0.9rem; padding: 1rem;">
+                                <?= isset($row['timeline']) ? $row['timeline'] : '-'; ?>
+                            </td>
+                            <td class="text-secondary" style="font-size: 0.9rem; padding: 1rem;">
+                                <?= isset($row['keterangan']) ? $row['keterangan'] : '-'; ?>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <a href="<?= isset($row['tautan']) ? $row['tautan'] : '#'; ?>" class="btn btn-sm btn-light" style="font-size: 0.8rem; color: var(--primary, #0A4D9E); border-color: var(--neutral-light, #E2E8F0);">
+                                    <i class="bi bi-link-45deg"></i> Link
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -453,7 +487,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                         <div class="fitur-icon mb-3 shadow-sm">
                             <i class="bi bi-bar-chart-line-fill"></i>
                         </div>
-                        <h6 class="fw-bold mb-2">Dashboard <span class="fw-normal text-secondary" style="font-size:12px;">Monitoring</span></h6>
+                        <h6 class="fw-bold mb-2" style="color: #000000">Dashboard Monitoring</h6>
                         <p class="text-secondary mb-0" style="font-size: 12.5px; line-height: 1.5;">Menampilkan ringkasan kepatuhan informasi secara visual.</p>
                     </div>
                 </div>
@@ -462,7 +496,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                         <div class="fitur-icon mb-3 shadow-sm">
                             <i class="bi bi-file-earmark-check"></i>
                         </div>
-                        <h6 class="fw-bold mb-2">Monitoring & Update</h6>
+                        <h6 class="fw-bold mb-2" style="color: #000000">Monitoring & Update</h6>
                         <p class="text-secondary mb-0" style="font-size: 12.5px; line-height: 1.5;">Melakukan update dan monitoring dokumen informasi setiap bidang.</p>
                     </div>
                 </div>
@@ -471,7 +505,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                         <div class="fitur-icon mb-3 shadow-sm">
                             <i class="bi bi-download"></i>
                         </div>
-                        <h6 class="fw-bold mb-2">Export Laporan</h6>
+                        <h6 class="fw-bold mb-2" style="color: #000000">Export Laporan</h6>
                         <p class="text-secondary mb-0" style="font-size: 12.5px; line-height: 1.5;">Menyediakan export laporan dalam format PDF dan Excel.</p>
                     </div>
                 </div>
@@ -480,7 +514,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                         <div class="fitur-icon mb-3 shadow-sm">
                             <i class="bi bi-bell"></i>
                         </div>
-                        <h6 class="fw-bold mb-2">Notifikasi</h6>
+                        <h6 class="fw-bold mb-2" style="color: #000000">Notifikasi</h6>
                         <p class="text-secondary mb-0" style="font-size: 12.5px; line-height: 1.5;">Pengingat dan informasi terkait jadwal monitoring.</p>
                     </div>
                 </div>
