@@ -35,7 +35,7 @@
 </div>
 
 <div class="table-responsive">
-    <table id="usersTable" class="table table-striped table-bordered custom-table" style="width:100%;">
+    <table id="usersTable" class="table table-striped table-bordered custom-table" style="width:100%; min-width: 2500px;">
         <thead>
             <tr>
                 <th>No</th>

@@ -96,7 +96,7 @@
 
 <!-- Table Panel -->
 <div class="table-responsive">
-    <table class="custom-table">
+    <table class="custom-table" style="min-width: 1000px;">
         <thead>
             <tr>
                 <th style="width: 5%;">No.</th>

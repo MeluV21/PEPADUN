@@ -28,7 +28,7 @@
         <?php $this->load->view('layouts/sidebar'); ?>
 
         <!-- Main Panel Content -->
-        <div style="flex-grow: 1;">
+        <div style="flex-grow: 1; min-width: 0; width: 100%;">
             <main class="main-content">
                 <div class="container-1200">
                     <!-- Top Navbar Panel matching mockup -->
@@ -39,9 +39,15 @@
                         </div>
                         <div class="top-navbar-right">
                             <div class="top-profile-badge" title="Profil Pengguna">
-                                <div class="top-profile-avatar">
-                                    <?= strtoupper(substr(session()->get('nama') ?? 'U', 0, 1)) ?>
-                                </div>
+                                <?php if (session()->get('image_user')): ?>
+                                    <div class="top-profile-avatar" style="padding: 0; overflow: hidden; background: none;">
+                                        <img src="<?= base_url('uploads/users/' . session()->get('image_user')) ?>" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                    </div>
+                                <?php else: ?>
+                                    <div class="top-profile-avatar">
+                                        <?= strtoupper(substr(session()->get('nama') ?? 'U', 0, 1)) ?>
+                                    </div>
+                                <?php endif; ?>
                                 <span style="color: var(--text-dark);"><?= esc(session()->get('nama') ?? 'User') ?></span>
                             </div>
                         </div>

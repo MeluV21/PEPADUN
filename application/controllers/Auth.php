@@ -13,11 +13,17 @@ class Auth extends MY_Controller {
         }
 
         if ($this->input->method() === 'post') {
-            $username = $this->input->post('username');
+            $login_input = $this->input->post('username'); // Form name is still username, but it receives email
             $password = $this->input->post('password');
 
             $userModel = $this->User_model;
-            $user = $userModel->where('username', $username)->first();
+            
+            // Cek berdasarkan email terlebih dahulu, atau fallback ke username
+            $user = $userModel->groupStart()
+                              ->where('email', $login_input)
+                              ->orWhere('username', $login_input)
+                              ->groupEnd()
+                              ->first();
 
             if ($user && password_verify($password, $user['password'])) {
                 session()->set([
@@ -25,13 +31,14 @@ class Auth extends MY_Controller {
                     'username'   => $user['username'],
                     'nama'       => $user['nama'],
                     'role'       => $user['role'],
+                    'image_user' => $user['image_user'],
                     'isLoggedIn' => true,
                 ]);
 
                 // Fitur Ingat Saya
                 $this->load->helper('cookie');
                 if ($this->input->post('ingat_saya')) {
-                    set_cookie('remember_email', $username, 3600 * 24 * 30); // 30 hari
+                    set_cookie('remember_email', $login_input, 3600 * 24 * 30); // 30 hari
                     set_cookie('remember_password', $password, 3600 * 24 * 30);
                 } else {
                     delete_cookie('remember_email');

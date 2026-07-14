@@ -686,8 +686,10 @@ table.custom-table tbody tr:hover {
 /* Top bar with logo, notifications, user */
 .top-navbar-panel {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
     margin-bottom: 2rem;
     background-color: var(--white);
     border: 1px solid var(--neutral-light);
@@ -746,6 +748,7 @@ table.custom-table tbody tr:hover {
     display: flex;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .triwulan-tab-btn {
@@ -1044,15 +1047,37 @@ body.sidebar-collapsed .sidebar .btn-logout:hover::after {
     margin-bottom: 2.25rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .stats-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Responsive Filters Row */
+.filters-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    background: var(--white);
+    padding: 1rem 1.5rem;
+    border-radius: var(--br-12);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--neutral-light);
+}
+
+@media (max-width: 768px) {
+    .filters-row {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 

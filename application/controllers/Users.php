@@ -150,6 +150,7 @@ class Users extends Admin_Controller {
                 'username' => $data['username'],
                 'nama' => $data['nama'],
                 'role'     => $data['role'],
+                'image_user' => $data['image_user'] ?? session()->get('image_user'),
             ]);
         }
 

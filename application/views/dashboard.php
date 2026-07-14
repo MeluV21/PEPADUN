@@ -1,5 +1,5 @@
 <!-- Filters Row -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: var(--white); padding: 1rem 1.5rem; border-radius: var(--br-12); box-shadow: var(--shadow-sm); border: 1px solid var(--neutral-light);">
+<div class="filters-row">
     <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-dark); font-weight: 500; font-size: 0.9rem;">
         <i class="bi bi-calendar3"></i> Hari ini: <?= date('d M Y') ?>
     </div>
@@ -27,7 +27,7 @@
 <div class="stats-grid">
     <!-- Card 1: Tingkat Kepatuhan -->
     <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
             <div>
                 <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Tingkat Kepatuhan</h4>
                 <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($tingkatKepatuhan ?? 0) ?>%</h2>
@@ -45,7 +45,7 @@
     
     <!-- Card 2: Selesai / Update -->
     <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
             <div>
                 <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Selesai / Update</h4>
                 <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($statusCompleted ?? 0) ?></h2>
@@ -65,7 +65,7 @@
     
     <!-- Card 3: Belum Update -->
     <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
             <div>
                 <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Belum Update</h4>
                 <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($statusPending ?? 0) ?></h2>
@@ -85,7 +85,7 @@
 
     <!-- Card 4: Total Item -->
     <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
             <div>
                 <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Total Item</h4>
                 <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($totalMonitoring ?? 0) ?></h2>
