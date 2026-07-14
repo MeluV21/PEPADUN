@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
     <title><?= isset($title) ? esc($title) : 'Pepadun Console' ?> - PEPADUN</title>
     <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,6 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Tom Select -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
 </head>
@@ -36,10 +40,9 @@
                         <div class="top-navbar-right">
                             <div class="top-profile-badge" title="Profil Pengguna">
                                 <div class="top-profile-avatar">
-                                    <?= strtoupper(substr(session()->get('fullname') ?? 'U', 0, 1)) ?>
+                                    <?= strtoupper(substr(session()->get('nama') ?? 'U', 0, 1)) ?>
                                 </div>
-                                <span style="color: var(--text-dark);"><?= esc(session()->get('fullname') ?? 'User') ?></span>
-                                <i class="bi bi-chevron-down" style="font-size: 0.7rem; color: var(--text-muted);"></i>
+                                <span style="color: var(--text-dark);"><?= esc(session()->get('nama') ?? 'User') ?></span>
                             </div>
                         </div>
                     </div>

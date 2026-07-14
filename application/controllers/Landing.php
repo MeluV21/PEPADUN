@@ -41,14 +41,17 @@ class Landing extends CI_Controller {
         }
 
         $queryBelumUpdateList = $db->query("
-            SELECT mi.name as judul, c.name as kategori
+            SELECT mi.name as judul, c.name as kategori,
+                   m.pj, mi.timeline, m.description as keterangan, mi.tautan
             FROM master_informasi mi
             LEFT JOIN categories c ON c.id = mi.category_id
             LEFT JOIN monitoring m ON m.master_id = mi.id AND m.year = ? AND m.triwulan = ?
             WHERE (m.status = 'pending' OR m.status IS NULL) AND (m.is_deleted = 0 OR m.is_deleted IS NULL)
-            LIMIT 10
         ", [$currentYear, $currentTriwulan]);
         $data['belumUpdate'] = $queryBelumUpdateList->result_array();
+
+        $data['currentYear'] = $currentYear;
+        $data['currentTriwulan'] = $currentTriwulan;
 
         $queryCategoryCompliance = $db->query("
             SELECT 

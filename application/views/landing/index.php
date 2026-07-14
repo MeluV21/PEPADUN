@@ -19,11 +19,16 @@
             </p>
 
             <div class="dropdown">
+                <?php 
+                    $triwulanRoman = [1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV'];
+                    $currentTriwulanNum = isset($currentTriwulan) ? $currentTriwulan : ceil(date('m') / 3);
+                    $currentYearNum = isset($currentYear) ? $currentYear : date('Y');
+                ?>
                 <button class="ds-dropdown-btn-outline dropdown-toggle" type="button" data-bs-toggle="dropdown">
 
                     <span>
                         <i class="bi bi-calendar-event me-2"></i>
-                        TRIWULAN I TAHUN <?= date('Y') ?>
+                        TRIWULAN <?= $triwulanRoman[$currentTriwulanNum] ?> TAHUN <?= $currentYearNum ?>
                     </span>
 
                 </button>
@@ -211,22 +216,26 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                 <table class="table custom-table table-hover" style="border-top: 1px dashed var(--neutral-light, #E2E8F0); min-width: 800px; margin-bottom: 0;">
                     <thead style="position: sticky; top: 0; background: white; z-index: 1;">
                         <tr>
-                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Item Informasi</th>
-                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Kategori</th>
-                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">PJ</th>
-                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Timeline</th>
-                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Keterangan</th>
-                            <th style="color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Tautan</th>
+                            <th style="width: 35%; color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Item Informasi</th>
+                            <th style="width: 15%; color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Kategori</th>
+                            <th style="width: 15%; color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">PJ</th>
+                            <th style="width: 10%; color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Timeline</th>
+                            <th style="width: 15%; color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem;">Keterangan</th>
+                            <th style="width: 10%; color: var(--text-muted, #64748B); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--neutral-light, #E2E8F0); padding: 1rem; text-align: center;">Tautan</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        $belumUpdate = $belumUpdate ?? [
-                            ['judul'=>'Struktur Organisasi', 'kategori'=>'Profil PPID', 'pj'=>'Subbag Tata Usaha', 'timeline'=>'Triwulan II', 'keterangan'=>'Belum diupload', 'tautan'=>'#'],
-                            ['judul'=>'Registrasi Permintaan Informasi', 'kategori'=>'Laporan', 'pj'=>'Subbag Tata Usaha', 'timeline'=>'Triwulan II', 'keterangan'=>'Menunggu verifikasi', 'tautan'=>'#'],
-                            ['judul'=>'Laporan Keberatan', 'kategori'=>'Laporan', 'pj'=>'Subbag Tata Usaha', 'timeline'=>'Triwulan II', 'keterangan'=>'-', 'tautan'=>'#'],
-                        ];
+                        $belumUpdate = $belumUpdate ?? [];
                         ?>
+
+                        <?php if (empty($belumUpdate)): ?>
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted, #64748B); padding: 2rem;">
+                                    Tidak ada item yang belum diupdate.
+                                </td>
+                            </tr>
+                        <?php else: ?>
 
                         <?php foreach($belumUpdate as $row): ?>
                         <tr>
@@ -234,29 +243,40 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                                 <div class="d-flex align-items-center gap-2">
                                     <i class="bi bi-exclamation-triangle text-danger" style="font-size: 1.1rem;"></i>
                                     <span class="fw-medium text-dark" style="font-size: 0.9rem;">
-                                        <?= $row['judul']; ?>
+                                        <?= esc($row['judul']); ?>
                                     </span>
                                 </div>
                             </td>
                             <td class="text-secondary" style="font-size: 0.9rem; padding: 1rem;">
-                                <?= $row['kategori']; ?>
+                                <?php 
+                                    $catName = esc($row['kategori'] ?? '');
+                                    if (empty($catName) || strtolower(trim($catName)) === 'tanpa kategori' || strtolower(trim($catName)) === 'lainnya') {
+                                        $catName = '-';
+                                    }
+                                    echo $catName;
+                                ?>
                             </td>
                             <td class="text-secondary" style="font-size: 0.9rem; padding: 1rem;">
-                                <?= isset($row['pj']) ? $row['pj'] : '-'; ?>
+                                <?= (!empty($row['pj'])) ? esc($row['pj']) : '-'; ?>
                             </td>
                             <td class="text-secondary" style="font-size: 0.9rem; padding: 1rem;">
-                                <?= isset($row['timeline']) ? $row['timeline'] : '-'; ?>
+                                <?= (!empty($row['timeline'])) ? esc($row['timeline']) : '-'; ?>
                             </td>
                             <td class="text-secondary" style="font-size: 0.9rem; padding: 1rem;">
-                                <?= isset($row['keterangan']) ? $row['keterangan'] : '-'; ?>
+                                <?= (!empty($row['keterangan'])) ? esc($row['keterangan']) : '-'; ?>
                             </td>
-                            <td style="padding: 1rem;">
-                                <a href="<?= isset($row['tautan']) ? $row['tautan'] : '#'; ?>" class="btn btn-sm btn-light" style="font-size: 0.8rem; color: var(--primary, #0A4D9E); border-color: var(--neutral-light, #E2E8F0);">
-                                    <i class="bi bi-link-45deg"></i> Link
-                                </a>
+                            <td style="padding: 1rem; text-align: center;">
+                                <?php if (!empty($row['tautan'])): ?>
+                                    <a href="<?= esc($row['tautan']) ?>" target="_blank" class="btn-tertiary" title="<?= esc($row['tautan']) ?>" style="padding: 0; font-size: 1.15rem; color: var(--primary, #0A4D9E);">
+                                        <i class="bi bi-link-45deg"></i>
+                                    </a>
+                                <?php else: ?>
+                                    <span style="color: var(--text-muted, #64748b); font-size: 0.8rem;">-</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

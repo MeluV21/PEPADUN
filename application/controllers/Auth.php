@@ -21,12 +21,23 @@ class Auth extends MY_Controller {
 
             if ($user && password_verify($password, $user['password'])) {
                 session()->set([
-                    'id'         => $user['id'],
+                    'id_user'    => $user['id_user'],
                     'username'   => $user['username'],
-                    'fullname'   => $user['fullname'],
+                    'nama'       => $user['nama'],
                     'role'       => $user['role'],
                     'isLoggedIn' => true,
                 ]);
+
+                // Fitur Ingat Saya
+                $this->load->helper('cookie');
+                if ($this->input->post('ingat_saya')) {
+                    set_cookie('remember_email', $username, 3600 * 24 * 30); // 30 hari
+                    set_cookie('remember_password', $password, 3600 * 24 * 30);
+                } else {
+                    delete_cookie('remember_email');
+                    delete_cookie('remember_password');
+                }
+
                 redirect('dashboard');
             }
 
@@ -34,7 +45,11 @@ class Auth extends MY_Controller {
             redirect('login');
         }
 
-        $this->load->view('auth/login');
+        $this->load->helper('cookie');
+        $data['remember_email'] = get_cookie('remember_email');
+        $data['remember_password'] = get_cookie('remember_password');
+
+        $this->load->view('auth/login', $data);
     }
 
     public function logout() {

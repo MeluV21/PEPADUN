@@ -14,8 +14,10 @@ class Categories extends Admin_Controller {
         $search = $this->input->get('search');
         
         if (!empty($search)) {
+            $categoryModel->groupStart();
             $categoryModel->like('name', $search);
-            $categoryModel->or_like('description', $search);
+            $categoryModel->orLike('description', $search);
+            $categoryModel->groupEnd();
         }
         
         $data['searchQuery'] = $search;

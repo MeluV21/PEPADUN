@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Migration_Create_users_table extends CI_Migration {
     public function up() {
         $this->dbforge->add_field([
-            'id' => [
+            'id_user' => [
                 'type'           => 'INT',
                 'constraint'     => 11,
                 'unsigned'       => TRUE,
@@ -18,25 +18,26 @@ class Migration_Create_users_table extends CI_Migration {
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
             ],
-            'fullname' => [
+            'nama' => [
                 'type'       => 'VARCHAR',
-                'constraint' => 100,
+                'constraint' => '100',
             ],
             'role' => [
                 'type'       => 'ENUM',
                 'constraint' => ['admin', 'karyawan'],
                 'default'    => 'karyawan',
             ],
-            'created_at' => [
+            'created' => [
                 'type' => 'DATETIME',
                 'null' => TRUE,
             ],
-            'updated_at' => [
+            'modified' => [
                 'type' => 'DATETIME',
                 'null' => TRUE,
             ],
         ]);
-        $this->dbforge->add_key('id', TRUE);
+        
+        $this->dbforge->add_key('id_user', TRUE);
         $this->dbforge->create_table('users');
         
         // Add unique key to username field

@@ -26,11 +26,11 @@
             $currentYear = (int) date('Y');
             $years = [$currentYear, $currentYear - 1, $currentYear - 2];
             
-            $selectedYear = (int) ($CI->input->get('year') !== NULL ? $CI->input->get('year') : '2026');
-            $selectedTriwulan = (int) ($CI->input->get('triwulan') !== NULL ? $CI->input->get('triwulan') : 1);
+            $selectedYear = (int) ($CI->input->get('year') !== NULL ? $CI->input->get('year') : date('Y'));
+            $selectedTriwulan = (int) ($CI->input->get('triwulan') !== NULL ? $CI->input->get('triwulan') : ceil(date('m') / 3));
         ?>
         <li class="sidebar-item <?= ($segment === 'dashboard' || empty($segment)) ? 'active' : '' ?>">
-            <a href="<?= base_url('dashboard') ?>" class="sidebar-link" data-title="Dashboard">
+            <a href="<?= base_url("dashboard?year={$selectedYear}&triwulan={$selectedTriwulan}") ?>" class="sidebar-link" data-title="Dashboard">
                 <div class="sidebar-link-content">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
@@ -39,7 +39,7 @@
         </li>
         
         <li class="sidebar-item <?= ($segment === 'monitoring') ? 'active' : '' ?>">
-            <a href="<?= base_url('monitoring') ?>" class="sidebar-link sidebar-link-monitoring" data-title="Monitoring">
+            <a href="<?= base_url("monitoring?year={$selectedYear}&triwulan={$selectedTriwulan}") ?>" class="sidebar-link sidebar-link-monitoring" data-title="Monitoring">
                 <div class="sidebar-link-content">
                     <i class="bi bi-clipboard-check"></i>
                     <span>Monitoring</span>

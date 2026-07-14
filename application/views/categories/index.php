@@ -3,11 +3,9 @@
     <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
         <!-- Left side: Search Filter -->
         <form action="<?= base_url('categories') ?>" method="GET" style="margin: 0; flex: 1; max-width: 300px;">
-            <div style="position: relative; width: 100%;">
-                <input type="text" name="search" class="form-control" placeholder="Cari kategori..." value="<?= isset($searchQuery) ? esc($searchQuery) : '' ?>" autocomplete="off" style="padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.85rem; padding-right: 2.5rem; width: 100%;">
-                <button type="submit" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 0; margin: 0; outline: none; cursor: pointer; color: var(--text-muted);">
-                    <i class="bi bi-search" style="font-size: 0.95rem;"></i>
-                </button>
+            <div class="input-icon-wrapper" style="width: 100%; margin-bottom: 0;">
+                <input type="text" id="search" name="search" class="form-control form-control-icon" placeholder="Cari kategori..." value="<?= isset($searchQuery) ? esc($searchQuery) : '' ?>" autocomplete="off" style="padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.85rem; width: 100%;" onkeypress="if(event.keyCode === 13) { this.form.submit(); return false; }">
+                <i class="bi bi-search" style="font-size: 0.95rem;"></i>
             </div>
         </form>
 
@@ -77,16 +75,16 @@
         <form action="<?= base_url('categories/store') ?>" method="POST">
             <?= csrf_field() ?>
             <div class="form-group">
-                <label for="add_name">Nama Kategori</label>
+                <label for="add_name">Nama Kategori <span style="color: red;">*</span></label>
                 <input type="text" id="add_name" name="name" class="form-control" placeholder="Masukkan nama kategori (misal: Kepegawaian)..." required autocomplete="off">
             </div>
             <div class="form-group">
-                <label for="add_description">Deskripsi</label>
+                <label for="add_description">Deskripsi (Opsional)</label>
                 <textarea id="add_description" name="description" class="textarea-control" placeholder="Masukkan deskripsi singkat kategori kerja..."></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Batal</button>
-                <button type="submit" class="btn btn-primary">Simpan Kategori</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
             </div>
         </form>
     </div>
@@ -102,16 +100,16 @@
         <form id="editForm" action="" method="POST">
             <?= csrf_field() ?>
             <div class="form-group">
-                <label for="edit_name">Nama Kategori</label>
+                <label for="edit_name">Nama Kategori <span style="color: red;">*</span></label>
                 <input type="text" id="edit_name" name="name" class="form-control" required autocomplete="off">
             </div>
             <div class="form-group">
-                <label for="edit_description">Deskripsi</label>
+                <label for="edit_description">Deskripsi (Opsional)</label>
                 <textarea id="edit_description" name="description" class="textarea-control"></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Batal</button>
-                <button type="submit" class="btn btn-primary">Perbarui Kategori</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
             </div>
         </form>
     </div>
@@ -152,4 +150,47 @@
             closeEditModal();
         }
     }
+
+    // Live Search Debounce logic matching monitoring
+    let debounceTimer;
+    const searchInput = document.getElementById('search');
+
+    window.addEventListener('DOMContentLoaded', (event) => {
+        // Restore focus if coming from a search reload
+        if (sessionStorage.getItem('searchFocus') === '1' && searchInput) {
+            searchInput.focus();
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.value = val;
+            sessionStorage.removeItem('searchFocus');
+        } else if (searchInput && searchInput.value !== '') {
+            searchInput.focus();
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.value = val;
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                
+                if (this.value === '') {
+                    sessionStorage.setItem('searchFocus', '1');
+                    this.form.submit();
+                    return;
+                }
+                
+                debounceTimer = setTimeout(() => {
+                    sessionStorage.setItem('searchFocus', '1');
+                    this.form.submit();
+                }, 600);
+            });
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sessionStorage.setItem('searchFocus', '1');
+                }
+            });
+        }
+    });
 </script>

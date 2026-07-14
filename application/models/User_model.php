@@ -3,9 +3,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class User_model extends MY_Model {
     protected $table            = 'users';
-    protected $primaryKey       = 'id';
+    protected $primaryKey       = 'id_user';
     protected $allowedFields    = [
-        'username', 'password', 'fullname', 'role',
+        'username', 'password', 'nama', 'role',
         'email', 'nip', 'jabatan_id', 'substansi_id', 'image_user', 'level_user', 
         'status_user', 'telp', 'no_dosir', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 
         'pangkat', 'tipe_pegawai', 'tmt_pangkat', 'eselon', 'kode_jabatan', 'kelas_jabatan', 
@@ -15,6 +15,6 @@ class User_model extends MY_Model {
         'kontrak_awal', 'kontrak_akhir'
     ];
     protected $useTimestamps    = TRUE;
-    protected $createdField     = 'created_at';
-    protected $updatedField     = 'updated_at';
+    protected $createdField     = 'created';
+    protected $updatedField     = 'modified';
 }

@@ -49,11 +49,16 @@
             <form action="<?= base_url('login') ?>" method="POST">
                 <?= csrf_field() ?>
                 
+                <?php 
+                    $email_val = !empty(old('username')) ? old('username') : (isset($remember_email) ? $remember_email : '');
+                    $pass_val = isset($remember_password) ? $remember_password : '';
+                    $isChecked = !empty($remember_email) ? 'checked' : '';
+                ?>
                 <div class="form-group">
                     <label for="username">Email</label>
                     <div class="input-icon-wrapper">
                         <i class="bi bi-envelope left-icon"></i>
-                        <input type="text" id="username" name="username" placeholder="Masukkan email Anda" value="<?= old('username') ?>" required autocomplete="off">
+                        <input type="text" id="username" name="username" placeholder="Masukkan email Anda" value="<?= $email_val ?>" required autocomplete="off">
                     </div>
                 </div>
 
@@ -61,13 +66,13 @@
                     <label for="password">Kata Sandi</label>
                     <div class="input-icon-wrapper">
                         <i class="bi bi-lock left-icon"></i>
-                        <input type="password" id="password" name="password" placeholder="Masukkan kata sandi Anda" required>
-                        <i class="bi bi-eye right-icon" id="togglePassword"></i>
+                        <input type="password" id="password" name="password" placeholder="Masukkan kata sandi Anda" value="<?= $pass_val ?>" required>
+                        <i class="bi bi-eye-slash right-icon" id="togglePassword" onclick="toggleLoginPassword()" style="cursor: pointer;"></i>
                     </div>
                 </div>
 
                 <div class="remember-me">
-                    <input type="checkbox" id="ingat_saya" name="ingat_saya">
+                    <input type="checkbox" id="ingat_saya" name="ingat_saya" <?= $isChecked ?>>
                     <label for="ingat_saya">Ingat saya</label>
                 </div>
 
@@ -79,18 +84,20 @@
     </div>
 
     <script>
-        // Toggle Password Visibility
-        const togglePassword = document.querySelector('#togglePassword');
-        const password = document.querySelector('#password');
-
-        togglePassword.addEventListener('click', function (e) {
-            // toggle the type attribute
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            // toggle the icon
-            this.classList.toggle('bi-eye');
-            this.classList.toggle('bi-eye-slash');
-        });
+        function toggleLoginPassword() {
+            const password = document.getElementById('password');
+            const icon = document.getElementById('togglePassword');
+            
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            }
+        }
     </script>
 </body>
 </html>

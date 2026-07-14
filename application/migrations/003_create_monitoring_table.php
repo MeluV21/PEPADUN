@@ -50,7 +50,7 @@ class Migration_Create_monitoring_table extends CI_Migration {
         
         // Add foreign key constraints
         $this->db->query("ALTER TABLE `monitoring` ADD CONSTRAINT `fk_monitoring_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE");
-        $this->db->query("ALTER TABLE `monitoring` ADD CONSTRAINT `fk_monitoring_user` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE");
+        $this->db->query("ALTER TABLE `monitoring` ADD CONSTRAINT `fk_monitoring_user` FOREIGN KEY (`created_by`) REFERENCES `users` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE");
     }
 
     public function down() {

@@ -1,10 +1,4 @@
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
-
 <style>
-    div.dataTables_wrapper div.dataTables_filter { text-align: right; margin-bottom: 15px; }
-    div.dataTables_wrapper div.dataTables_length { margin-bottom: 15px; }
-    .dt-buttons { margin-bottom: 15px; }
     th { white-space: nowrap; }
     td { white-space: nowrap; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -15,18 +9,33 @@
 <!-- Header Action Card -->
 <div class="card" style="margin-bottom: 2rem; padding: 1rem 1.25rem;">
     <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-        <!-- Left side: Title -->
-        <h2 style="font-weight: 700; color: var(--primary); margin: 0; font-size: 1.25rem;">Data Karyawan</h2>
+        <!-- Left side: Search -->
+        <div style="display: flex; align-items: center; gap: 1rem; flex: 1; flex-wrap: wrap;">
+            <form action="<?= base_url('users') ?>" method="GET" style="margin: 0; flex: 1; max-width: 300px;">
+                <div class="input-icon-wrapper" style="width: 100%; margin-bottom: 0;">
+                    <input type="text" id="search" name="search" class="form-control form-control-icon" placeholder="Cari pengguna..." value="<?= isset($searchQuery) ? esc($searchQuery) : '' ?>" autocomplete="off" style="padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.85rem; width: 100%;" onkeypress="if(event.keyCode === 13) { this.form.submit(); return false; }">
+                    <i class="bi bi-search" style="font-size: 0.95rem;"></i>
+                </div>
+            </form>
+        </div>
 
         <!-- Right side: Actions -->
-        <button type="button" class="btn btn-primary" onclick="openAddModal()" style="background-color: #0c3d79; border-color: #0c3d79; padding: 0.5rem 1.25rem; font-size: 0.85rem;">
-            <i class="bi bi-person-plus-fill"></i> Tambah Data
-        </button>
+        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <?php if (!empty($searchQuery)): ?>
+                <a href="<?= base_url('users') ?>" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    Reset
+                </a>
+            <?php endif; ?>
+            <!-- Right side: Actions -->
+            <button type="button" class="btn btn-primary" onclick="openAddModal()" style="background-color: #0c3d79; border-color: #0c3d79; padding: 0.5rem 1.25rem; font-size: 0.85rem;">
+                <i class="bi bi-person-plus-fill"></i> Tambah Data
+            </button>
+        </div>
     </div>
 </div>
 
-<div class="table-responsive" style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-    <table id="usersTable" class="table table-striped table-bordered custom-table" style="width:100%">
+<div class="table-responsive">
+    <table id="usersTable" class="table table-striped table-bordered custom-table" style="width:100%;">
         <thead>
             <tr>
                 <th>No</th>
@@ -68,7 +77,7 @@
                 <th>Kontrak Awal</th>
                 <th>Kontrak Akhir</th>
                 <th>Role Akses</th>
-                <th style="text-align: center;">Aksi</th>
+                <th style="text-align: center; position: sticky; right: 0; background-color: #f8fafc; z-index: 1; box-shadow: -4px 0 8px rgba(0,0,0,0.05); border-left: 2px solid #e2e8f0;">Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -77,7 +86,7 @@
                     <td><?= $rowIndex++ ?></td>
                     <td><?= esc($user['username'] ?: '-') ?></td>
                     <td><?= esc($user['email'] ?: '-') ?></td>
-                    <td><?= esc($user['fullname'] ?: '-') ?></td>
+                    <td><?= esc($user['nama'] ?: '-') ?></td>
                     <td><?= esc($user['nip'] ?: '-') ?></td>
                     <td><?= esc($user['jabatan_id'] ?: '-') ?></td>
                     <td><?= esc($user['substansi_id'] ?: '-') ?></td>
@@ -113,19 +122,15 @@
                     <td><?= esc($user['kontrak_awal'] ?: '-') ?></td>
                     <td><?= esc($user['kontrak_akhir'] ?: '-') ?></td>
                     <td><?= esc($user['role'] ?: '-') ?></td>
-                    <td style="text-align: center; white-space: nowrap;">
+                    <td style="text-align: center; white-space: nowrap; position: sticky; right: 0; background-color: #fff; z-index: 1; box-shadow: -4px 0 8px rgba(0,0,0,0.05); border-left: 2px solid #e2e8f0;">
                         <div style="display: inline-flex; gap: 0.75rem; align-items: center; vertical-align: middle;">
                             <button type="button" onclick='openEditModal(<?= htmlspecialchars(json_encode($user), ENT_QUOTES, "UTF-8") ?>)' title="Edit Karyawan" style="border: none; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #F0F5FF; color: #2563EB; border-radius: 10px; transition: all 0.2s;">
                                 <i class="bi bi-pencil"></i>
                             </button>
-                            <?php if (session()->get('id') != $user['id']): ?>
-                                <a href="<?= base_url('users/delete/' . $user['id']) ?>" title="Hapus Karyawan" onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?')" style="display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #FFF0F0; color: #EF4444; border-radius: 10px; text-decoration: none; transition: all 0.2s;">
+                            <?php if (session()->get('role') === 'admin'): ?>
+                                <a href="<?= base_url('users/delete/' . $user['id_user']) ?>" title="Hapus Karyawan" onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?')" style="display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #FFF0F0; color: #EF4444; border-radius: 10px; text-decoration: none; transition: all 0.2s;">
                                     <i class="bi bi-trash"></i>
                                 </a>
-                            <?php else: ?>
-                                <button type="button" disabled style="border: none; display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #f1f5f9; color: #94a3b8; border-radius: 10px; cursor: not-allowed;" title="Tidak dapat menghapus akun sendiri">
-                                    <i class="bi bi-trash"></i>
-                                </button>
                             <?php endif; ?>
                         </div>
                     </td>
@@ -142,26 +147,29 @@
             <h3>Tambah Data Karyawan</h3>
             <button class="modal-close" type="button" onclick="closeAddModal()">&times;</button>
         </div>
-        <form action="<?= base_url('users/store') ?>" method="POST">
+        <form action="<?= base_url('users/store') ?>" method="POST" enctype="multipart/form-data">
             <?= csrf_field() ?>
             
             <div class="form-group" style="margin-bottom: 20px;">
-                <label for="add_password">Password (Wajib untuk Login)</label>
-                <input type="password" id="add_password" name="password" class="form-control" placeholder="Masukkan password (minimal 6 karakter)..." required>
+                <label for="add_password">Password <span style="color: red;">*</span></label>
+                <div style="position: relative;">
+                    <input type="password" id="add_password" name="password" class="form-control" placeholder="Masukkan password (minimal 6 karakter)..." required style="padding-right: 40px;">
+                    <i class="bi bi-eye-slash" id="toggle_add_password" onclick="togglePassword('add_password', 'toggle_add_password')" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b; font-size: 1.1rem;"></i>
+                </div>
             </div>
             
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="add_username">Username</label>
+                    <label for="add_username">Username <span style="color: red;">*</span></label>
                     <input type="text" id="add_username" name="username" class="form-control" autocomplete="off" required>
                 </div>
                 <div class="form-group">
-                    <label for="add_email">Email</label>
-                    <input type="text" id="add_email" name="email" class="form-control" autocomplete="off" >
+                    <label for="add_email">Email <span style="color: red;">*</span></label>
+                    <input type="text" id="add_email" name="email" class="form-control" autocomplete="off" required>
                 </div>
                 <div class="form-group">
-                    <label for="add_fullname">Nama</label>
-                    <input type="text" id="add_fullname" name="fullname" class="form-control" autocomplete="off" required>
+                    <label for="add_nama">Nama <span style="color: red;">*</span></label>
+                    <input type="text" id="add_nama" name="nama" class="form-control" autocomplete="off" required>
                 </div>
                 <div class="form-group">
                     <label for="add_nip">NIP</label>
@@ -176,8 +184,8 @@
                     <input type="text" id="add_substansi_id" name="substansi_id" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
-                    <label for="add_image_user">Image User</label>
-                    <input type="text" id="add_image_user" name="image_user" class="form-control" autocomplete="off" >
+                    <label for="add_image_user">Image User <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Hanya foto)</span></label>
+                    <input type="file" id="add_image_user" name="image_user" accept="image/png, image/jpeg, image/jpg, image/gif" class="form-control">
                 </div>
                 <div class="form-group">
                     <label for="add_level_user">Level User</label>
@@ -185,7 +193,12 @@
                 </div>
                 <div class="form-group">
                     <label for="add_status_user">Status User</label>
-                    <input type="text" id="add_status_user" name="status_user" class="form-control" autocomplete="off" >
+                    <select id="add_status_user" name="status_user" class="select-control">
+                        <option value="" selected disabled>Pilih Status User</option>
+                        <option value="Aktif">Aktif</option>
+                        <option value="Tidak Aktif">Tidak Aktif</option>
+                        <option value="Diblokir">Diblokir</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="add_telp">Telepon/WhatsApp</label>
@@ -201,11 +214,15 @@
                 </div>
                 <div class="form-group">
                     <label for="add_tanggal_lahir">Tanggal Lahir</label>
-                    <input type="text" id="add_tanggal_lahir" name="tanggal_lahir" class="form-control" autocomplete="off" >
+                    <input type="date" id="add_tanggal_lahir" name="tanggal_lahir" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
                     <label for="add_jenis_kelamin">Jenis Kelamin</label>
-                    <input type="text" id="add_jenis_kelamin" name="jenis_kelamin" class="form-control" autocomplete="off" >
+                    <select id="add_jenis_kelamin" name="jenis_kelamin" class="select-control">
+                        <option value="" selected disabled>Pilih Jenis Kelamin</option>
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="add_pangkat">Pangkat</label>
@@ -217,7 +234,7 @@
                 </div>
                 <div class="form-group">
                     <label for="add_tmt_pangkat">TMT Pangkat</label>
-                    <input type="text" id="add_tmt_pangkat" name="tmt_pangkat" class="form-control" autocomplete="off" >
+                    <input type="date" id="add_tmt_pangkat" name="tmt_pangkat" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
                     <label for="add_eselon">Eselon</label>
@@ -237,7 +254,17 @@
                 </div>
                 <div class="form-group">
                     <label for="add_pendidikan">Pendidikan</label>
-                    <input type="text" id="add_pendidikan" name="pendidikan" class="form-control" autocomplete="off" >
+                    <select id="add_pendidikan" name="pendidikan" class="select-control">
+                        <option value="" selected disabled>Pilih Pendidikan</option>
+                        <option value="SD">SD</option>
+                        <option value="SMP">SMP</option>
+                        <option value="SMA/SMK">SMA/SMK</option>
+                        <option value="D3">D3</option>
+                        <option value="D4">D4</option>
+                        <option value="S1">S1</option>
+                        <option value="S2">S2</option>
+                        <option value="S3">S3</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="add_jurusan">Jurusan</label>
@@ -245,7 +272,15 @@
                 </div>
                 <div class="form-group">
                     <label for="add_tahun_lulus">Tahun Lulus</label>
-                    <input type="text" id="add_tahun_lulus" name="tahun_lulus" class="form-control" autocomplete="off" >
+                    <select id="add_tahun_lulus" name="tahun_lulus" class="select-control">
+                        <option value="" selected disabled>Pilih Tahun</option>
+                        <?php 
+                        $currentYear = date('Y');
+                        for($y = $currentYear; $y >= 1950; $y--) {
+                            echo "<option value=\"$y\">$y</option>";
+                        }
+                        ?>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="add_nama_sekolah">Nama Sekolah</label>
@@ -253,11 +288,20 @@
                 </div>
                 <div class="form-group">
                     <label for="add_agama">Agama</label>
-                    <input type="text" id="add_agama" name="agama" class="form-control" autocomplete="off" >
+                    <select id="add_agama" name="agama" class="select-control">
+                        <option value="" selected disabled>Pilih Agama</option>
+                        <option value="Islam">Islam</option>
+                        <option value="Kristen Protestan">Kristen Protestan</option>
+                        <option value="Katolik">Katolik</option>
+                        <option value="Hindu">Hindu</option>
+                        <option value="Buddha">Buddha</option>
+                        <option value="Konghucu">Konghucu</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="add_tmt_jabatan">TMT Jabatan</label>
-                    <input type="text" id="add_tmt_jabatan" name="tmt_jabatan" class="form-control" autocomplete="off" >
+                    <input type="date" id="add_tmt_jabatan" name="tmt_jabatan" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
                     <label for="add_status_pegawai">Status Pegawai</label>
@@ -269,7 +313,7 @@
                 </div>
                 <div class="form-group">
                     <label for="add_tgl_pensiun">Tgl Pensiun</label>
-                    <input type="text" id="add_tgl_pensiun" name="tgl_pensiun" class="form-control" autocomplete="off" >
+                    <input type="date" id="add_tgl_pensiun" name="tgl_pensiun" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
                     <label for="add_masa_kerja">Masa Kerja</label>
@@ -277,7 +321,13 @@
                 </div>
                 <div class="form-group">
                     <label for="add_status_nikah">Status Nikah</label>
-                    <input type="text" id="add_status_nikah" name="status_nikah" class="form-control" autocomplete="off" >
+                    <select id="add_status_nikah" name="status_nikah" class="select-control">
+                        <option value="" selected disabled>Pilih Status Nikah</option>
+                        <option value="Belum Kawin">Belum Kawin</option>
+                        <option value="Kawin">Kawin</option>
+                        <option value="Cerai Hidup">Cerai Hidup</option>
+                        <option value="Cerai Mati">Cerai Mati</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="add_lama_jabatan">Lama Jabatan</label>
@@ -293,14 +343,14 @@
                 </div>
                 <div class="form-group">
                     <label for="add_kontrak_awal">Kontrak Awal</label>
-                    <input type="text" id="add_kontrak_awal" name="kontrak_awal" class="form-control" autocomplete="off" >
+                    <input type="date" id="add_kontrak_awal" name="kontrak_awal" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
                     <label for="add_kontrak_akhir">Kontrak Akhir</label>
-                    <input type="text" id="add_kontrak_akhir" name="kontrak_akhir" class="form-control" autocomplete="off" >
+                    <input type="date" id="add_kontrak_akhir" name="kontrak_akhir" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
-                    <label for="add_role">Role Akses</label>
+                    <label for="add_role">Role Akses <span style="color: red;">*</span></label>
                     <select id="add_role" name="role" class="select-control" required>
                         <option value="karyawan">Karyawan</option>
                         <option value="admin">Admin</option>
@@ -310,7 +360,7 @@
             
             <div class="modal-footer" style="margin-top: 20px;">
                 <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Batal</button>
-                <button type="submit" class="btn btn-primary">Simpan Data</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
             </div>
         </form>
     </div>
@@ -323,26 +373,29 @@
             <h3>Edit Data Karyawan</h3>
             <button class="modal-close" type="button" onclick="closeEditModal()">&times;</button>
         </div>
-        <form id="editForm" action="" method="POST">
+        <form id="editForm" action="" method="POST" enctype="multipart/form-data">
             <?= csrf_field() ?>
             
             <div class="form-group" style="margin-bottom: 20px;">
                 <label for="edit_password">Password <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Kosongkan jika tidak diubah)</span></label>
-                <input type="password" id="edit_password" name="password" class="form-control" placeholder="Masukkan password baru...">
+                <div style="position: relative;">
+                    <input type="password" id="edit_password" name="password" class="form-control" placeholder="Masukkan password baru..." style="padding-right: 40px;">
+                    <i class="bi bi-eye-slash" id="toggle_edit_password" onclick="togglePassword('edit_password', 'toggle_edit_password')" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b; font-size: 1.1rem;"></i>
+                </div>
             </div>
             
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="edit_username">Username</label>
+                    <label for="edit_username">Username <span style="color: red;">*</span></label>
                     <input type="text" id="edit_username" name="username" class="form-control" autocomplete="off" required>
                 </div>
                 <div class="form-group">
-                    <label for="edit_email">Email</label>
-                    <input type="text" id="edit_email" name="email" class="form-control" autocomplete="off" >
+                    <label for="edit_email">Email <span style="color: red;">*</span></label>
+                    <input type="text" id="edit_email" name="email" class="form-control" autocomplete="off" required>
                 </div>
                 <div class="form-group">
-                    <label for="edit_fullname">Nama</label>
-                    <input type="text" id="edit_fullname" name="fullname" class="form-control" autocomplete="off" required>
+                    <label for="edit_nama">Nama <span style="color: red;">*</span></label>
+                    <input type="text" id="edit_nama" name="nama" class="form-control" autocomplete="off" required>
                 </div>
                 <div class="form-group">
                     <label for="edit_nip">NIP</label>
@@ -357,8 +410,9 @@
                     <input type="text" id="edit_substansi_id" name="substansi_id" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
-                    <label for="edit_image_user">Image User</label>
-                    <input type="text" id="edit_image_user" name="image_user" class="form-control" autocomplete="off" >
+                    <label for="edit_image_user">Image User <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Kosongkan jika tidak diubah)</span></label>
+                    <input type="file" id="edit_image_user" name="image_user" accept="image/png, image/jpeg, image/jpg, image/gif" class="form-control">
+                    <input type="hidden" id="edit_old_image_user" name="old_image_user">
                 </div>
                 <div class="form-group">
                     <label for="edit_level_user">Level User</label>
@@ -366,7 +420,12 @@
                 </div>
                 <div class="form-group">
                     <label for="edit_status_user">Status User</label>
-                    <input type="text" id="edit_status_user" name="status_user" class="form-control" autocomplete="off" >
+                    <select id="edit_status_user" name="status_user" class="select-control">
+                        <option value="" selected disabled>Pilih Status User</option>
+                        <option value="Aktif">Aktif</option>
+                        <option value="Tidak Aktif">Tidak Aktif</option>
+                        <option value="Diblokir">Diblokir</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="edit_telp">Telepon/WhatsApp</label>
@@ -382,11 +441,15 @@
                 </div>
                 <div class="form-group">
                     <label for="edit_tanggal_lahir">Tanggal Lahir</label>
-                    <input type="text" id="edit_tanggal_lahir" name="tanggal_lahir" class="form-control" autocomplete="off" >
+                    <input type="date" id="edit_tanggal_lahir" name="tanggal_lahir" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
                     <label for="edit_jenis_kelamin">Jenis Kelamin</label>
-                    <input type="text" id="edit_jenis_kelamin" name="jenis_kelamin" class="form-control" autocomplete="off" >
+                    <select id="edit_jenis_kelamin" name="jenis_kelamin" class="select-control">
+                        <option value="" selected disabled>Pilih Jenis Kelamin</option>
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="edit_pangkat">Pangkat</label>
@@ -398,7 +461,7 @@
                 </div>
                 <div class="form-group">
                     <label for="edit_tmt_pangkat">TMT Pangkat</label>
-                    <input type="text" id="edit_tmt_pangkat" name="tmt_pangkat" class="form-control" autocomplete="off" >
+                    <input type="date" id="edit_tmt_pangkat" name="tmt_pangkat" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
                     <label for="edit_eselon">Eselon</label>
@@ -418,7 +481,17 @@
                 </div>
                 <div class="form-group">
                     <label for="edit_pendidikan">Pendidikan</label>
-                    <input type="text" id="edit_pendidikan" name="pendidikan" class="form-control" autocomplete="off" >
+                    <select id="edit_pendidikan" name="pendidikan" class="select-control">
+                        <option value="" selected disabled>Pilih Pendidikan</option>
+                        <option value="SD">SD</option>
+                        <option value="SMP">SMP</option>
+                        <option value="SMA/SMK">SMA/SMK</option>
+                        <option value="D3">D3</option>
+                        <option value="D4">D4</option>
+                        <option value="S1">S1</option>
+                        <option value="S2">S2</option>
+                        <option value="S3">S3</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="edit_jurusan">Jurusan</label>
@@ -426,7 +499,14 @@
                 </div>
                 <div class="form-group">
                     <label for="edit_tahun_lulus">Tahun Lulus</label>
-                    <input type="text" id="edit_tahun_lulus" name="tahun_lulus" class="form-control" autocomplete="off" >
+                    <select id="edit_tahun_lulus" name="tahun_lulus" class="select-control">
+                        <option value="" selected disabled>Pilih Tahun</option>
+                        <?php 
+                        for($y = $currentYear; $y >= 1950; $y--) {
+                            echo "<option value=\"$y\">$y</option>";
+                        }
+                        ?>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="edit_nama_sekolah">Nama Sekolah</label>
@@ -434,11 +514,20 @@
                 </div>
                 <div class="form-group">
                     <label for="edit_agama">Agama</label>
-                    <input type="text" id="edit_agama" name="agama" class="form-control" autocomplete="off" >
+                    <select id="edit_agama" name="agama" class="select-control">
+                        <option value="" selected disabled>Pilih Agama</option>
+                        <option value="Islam">Islam</option>
+                        <option value="Kristen Protestan">Kristen Protestan</option>
+                        <option value="Katolik">Katolik</option>
+                        <option value="Hindu">Hindu</option>
+                        <option value="Buddha">Buddha</option>
+                        <option value="Konghucu">Konghucu</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="edit_tmt_jabatan">TMT Jabatan</label>
-                    <input type="text" id="edit_tmt_jabatan" name="tmt_jabatan" class="form-control" autocomplete="off" >
+                    <input type="date" id="edit_tmt_jabatan" name="tmt_jabatan" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
                     <label for="edit_status_pegawai">Status Pegawai</label>
@@ -450,7 +539,7 @@
                 </div>
                 <div class="form-group">
                     <label for="edit_tgl_pensiun">Tgl Pensiun</label>
-                    <input type="text" id="edit_tgl_pensiun" name="tgl_pensiun" class="form-control" autocomplete="off" >
+                    <input type="date" id="edit_tgl_pensiun" name="tgl_pensiun" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
                     <label for="edit_masa_kerja">Masa Kerja</label>
@@ -458,7 +547,13 @@
                 </div>
                 <div class="form-group">
                     <label for="edit_status_nikah">Status Nikah</label>
-                    <input type="text" id="edit_status_nikah" name="status_nikah" class="form-control" autocomplete="off" >
+                    <select id="edit_status_nikah" name="status_nikah" class="select-control">
+                        <option value="" selected disabled>Pilih Status Nikah</option>
+                        <option value="Belum Kawin">Belum Kawin</option>
+                        <option value="Kawin">Kawin</option>
+                        <option value="Cerai Hidup">Cerai Hidup</option>
+                        <option value="Cerai Mati">Cerai Mati</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="edit_lama_jabatan">Lama Jabatan</label>
@@ -474,14 +569,14 @@
                 </div>
                 <div class="form-group">
                     <label for="edit_kontrak_awal">Kontrak Awal</label>
-                    <input type="text" id="edit_kontrak_awal" name="kontrak_awal" class="form-control" autocomplete="off" >
+                    <input type="date" id="edit_kontrak_awal" name="kontrak_awal" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
                     <label for="edit_kontrak_akhir">Kontrak Akhir</label>
-                    <input type="text" id="edit_kontrak_akhir" name="kontrak_akhir" class="form-control" autocomplete="off" >
+                    <input type="date" id="edit_kontrak_akhir" name="kontrak_akhir" class="form-control" autocomplete="off" >
                 </div>
                 <div class="form-group">
-                    <label for="edit_role">Role Akses</label>
+                    <label for="edit_role">Role Akses <span style="color: red;">*</span></label>
                     <select id="edit_role" name="role" class="select-control" required>
                         <option value="karyawan">Karyawan</option>
                         <option value="admin">Admin</option>
@@ -491,83 +586,73 @@
             
             <div class="modal-footer" style="margin-top: 20px;">
                 <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Batal</button>
-                <button type="submit" class="btn btn-primary">Perbarui Data</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- DataTables JS -->
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
+
 
 <script>
-    $(document).ready(function() {
-        var table = $('#usersTable').DataTable({
-            scrollX: true,
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            dom: '<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>' +
-                 '<'row'<'col-sm-12'tr>>' +
-                 '<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>',
-            buttons: [
-                'copy', 'csv', 'excel', 'pdf', 'print', 'colvis'
-            ],
-            language: {
-                search: "Search:",
-                lengthMenu: "Tampilkan _MENU_ data per halaman",
-                zeroRecords: "Tidak ada data yang ditemukan",
-                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                infoEmpty: "Showing 0 to 0 of 0 entries",
-                infoFiltered: "(disaring dari _MAX_ total data)",
-                paginate: {
-                    first: "First",
-                    last: "Last",
-                    next: "Next",
-                    previous: "Previous"
-                }
-            }
-        });
-        
-        table.buttons().container().appendTo( '#usersTable_wrapper .col-md-6:eq(0)' );
-    });
-
     const addModal = document.getElementById('addModal');
     const editModal = document.getElementById('editModal');
     const editForm = document.getElementById('editForm');
 
     function openAddModal() {
-        addModal.classList.add('show');
+        if(addModal) {
+            addModal.classList.add('show');
+        } else {
+            alert("Error: addModal element not found in HTML!");
+        }
     }
 
     function closeAddModal() {
-        addModal.classList.remove('show');
+        if(addModal) addModal.classList.remove('show');
     }
 
     function openEditModal(userData) {
-        editForm.action = `<?= base_url('users/update') ?>/${userData.id}`;
+        console.log("Opening edit modal for:", userData);
+        if(!editModal || !editForm) {
+            alert("Error: editModal or editForm not found!");
+            return;
+        }
+        
+        editForm.action = `<?= base_url('users/update') ?>/${userData.id_user}`;
         
         for (const key in userData) {
             const el = document.getElementById('edit_' + key);
             if (el && key !== 'password') {
-                el.value = userData[key];
+                if (key === 'image_user') {
+                    const hiddenEl = document.getElementById('edit_old_image_user');
+                    if (hiddenEl) hiddenEl.value = userData[key] || '';
+                    continue;
+                }
+
+                let val = userData[key];
+                
+                // If it's a date input and the value looks like DD/MM/YYYY, convert it to YYYY-MM-DD
+                if (el.type === 'date' && val && val.includes('/')) {
+                    let parts = val.split('/');
+                    if (parts.length === 3) {
+                        val = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    }
+                }
+                
+                el.value = val;
             }
         }
         
-        document.getElementById('edit_password').value = '';
+        const pwd = document.getElementById('edit_password');
+        if(pwd) {
+            pwd.value = '';
+        }
+        
         editModal.classList.add('show');
     }
 
     function closeEditModal() {
-        editModal.classList.remove('show');
+        if(editModal) editModal.classList.remove('show');
     }
 
     window.onclick = function(event) {
@@ -578,4 +663,57 @@
             closeEditModal();
         }
     }
+
+    function togglePassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        }
+    }
+
+    // Live Search Debounce logic
+    let debounceTimer;
+    const searchInput = document.getElementById('search');
+
+    window.addEventListener('DOMContentLoaded', (event) => {
+        if (sessionStorage.getItem('searchFocus') === '1' && searchInput) {
+            searchInput.focus();
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.value = val;
+            sessionStorage.removeItem('searchFocus');
+        } else if (searchInput && searchInput.value !== '') {
+            searchInput.focus();
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.value = val;
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                if (this.value === '') {
+                    sessionStorage.setItem('searchFocus', '1');
+                    this.form.submit();
+                    return;
+                }
+                debounceTimer = setTimeout(() => {
+                    sessionStorage.setItem('searchFocus', '1');
+                    this.form.submit();
+                }, 600);
+            });
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sessionStorage.setItem('searchFocus', '1');
+                }
+            });
+        }
+    });
 </script>

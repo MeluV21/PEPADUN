@@ -143,6 +143,7 @@ body {
     color: #94a3b8;
     font-size: 16px;
     cursor: pointer;
+    pointer-events: auto !important;
 }
 
 /* Checkbox */

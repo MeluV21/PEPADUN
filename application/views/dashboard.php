@@ -5,17 +5,21 @@
     </div>
     
     <div style="display: flex; align-items: center; gap: 1rem;">
-        <label style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark); margin: 0;">Triwulan Aktif:</label>
-        <select class="select-control" style="width: auto; padding: 0.4rem 2.25rem 0.4rem 1rem; border-color: var(--primary); color: var(--primary); font-weight: 500;">
-            <option>Triwulan I (01 Jan - 31 Mar 2026)</option>
-            <option selected>Triwulan II (01 Apr - 30 Jun 2026)</option>
-            <option>Triwulan III (01 Jul - 30 Sep 2026)</option>
-            <option>Triwulan IV (01 Okt - 31 Des 2026)</option>
-        </select>
+        <form id="filterForm" action="<?= base_url('dashboard') ?>" method="GET" style="display: flex; align-items: center; gap: 1rem; margin: 0;">
+            <input type="hidden" name="year" value="<?= $selectedYear ?>">
+            <label style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark); margin: 0;">Triwulan Aktif:</label>
+            <select name="triwulan" class="select-control" onchange="this.form.submit()" style="width: auto; padding: 0.4rem 2.25rem 0.4rem 1rem; border-color: var(--primary); color: var(--primary); font-weight: 500;">
+                <option value="1" <?= $selectedTriwulan == 1 ? 'selected' : '' ?>>Triwulan I (01 Jan - 31 Mar <?= $selectedYear ?>)</option>
+                <option value="2" <?= $selectedTriwulan == 2 ? 'selected' : '' ?>>Triwulan II (01 Apr - 30 Jun <?= $selectedYear ?>)</option>
+                <option value="3" <?= $selectedTriwulan == 3 ? 'selected' : '' ?>>Triwulan III (01 Jul - 30 Sep <?= $selectedYear ?>)</option>
+                <option value="4" <?= $selectedTriwulan == 4 ? 'selected' : '' ?>>Triwulan IV (01 Okt - 31 Des <?= $selectedYear ?>)</option>
+            </select>
+        </form>
     </div>
 
     <div style="color: var(--text-muted); font-size: 0.85rem;">
-        <i class="bi bi-clock-history"></i> Terakhir diperbarui: <?= date('d M Y H:i') ?> WIB
+        <i class="bi bi-clock-history"></i> Terakhir diperbarui: 
+        <?= !empty($lastUpdate) ? date('d M Y H:i', strtotime($lastUpdate)) . ' WIB' : 'Belum ada data' ?>
     </div>
 </div>
 
@@ -26,15 +30,15 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <div>
                 <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Tingkat Kepatuhan</h4>
-                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($tingkatKepatuhan ?? 85) ?>%</h2>
+                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($tingkatKepatuhan ?? 0) ?>%</h2>
                 <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Kepatuhan Informasi Publik</p>
             </div>
             <div class="radial-progress-wrapper" style="width: 72px; height: 72px;">
                 <svg width="72" height="72" class="radial-progress-svg">
                     <circle cx="36" cy="36" r="32" class="radial-progress-bg"></circle>
-                    <circle cx="36" cy="36" r="32" class="radial-progress-fill" style="stroke-dasharray: 201; stroke-dashoffset: calc(201 - (201 * <?= esc($tingkatKepatuhan ?? 85) ?>) / 100);"></circle>
+                    <circle cx="36" cy="36" r="32" class="radial-progress-fill" style="stroke-dasharray: 201; stroke-dashoffset: calc(201 - (201 * <?= esc($tingkatKepatuhan ?? 0) ?>) / 100);"></circle>
                 </svg>
-                <div class="radial-progress-text" style="font-size: 0.9rem;"><?= esc($tingkatKepatuhan ?? 85) ?>%</div>
+                <div class="radial-progress-text" style="font-size: 0.9rem;"><?= esc($tingkatKepatuhan ?? 0) ?>%</div>
             </div>
         </div>
     </div>
@@ -44,16 +48,17 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
                 <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Selesai / Update</h4>
-                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($statusCompleted ?? 70) ?></h2>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Dari <?= esc($totalMonitoring ?? 90) ?> Item</p>
+                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($statusCompleted ?? 0) ?></h2>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Dari <?= esc($totalMonitoring ?? 0) ?> Item</p>
             </div>
             <div style="width: 40px; height: 40px; border-radius: 50%; background-color: rgba(34, 197, 94, 0.1); display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 1.25rem;">
                 <i class="bi bi-check-lg" style="stroke: currentColor; stroke-width: 1;"></i>
             </div>
         </div>
         <div style="margin-top: 1rem;">
+            <?php $percentCompleted = $totalMonitoring > 0 ? round(($statusCompleted / $totalMonitoring) * 100) : 0; ?>
             <div style="height: 6px; width: 100%; background-color: var(--neutral-light); border-radius: 3px; overflow: hidden; margin-bottom: 0.75rem;">
-                <div style="height: 100%; width: 77%; background-color: var(--success); border-radius: 3px;"></div>
+                <div style="height: 100%; width: <?= $percentCompleted ?>%; background-color: var(--success); border-radius: 3px;"></div>
             </div>
         </div>
     </div>
@@ -63,16 +68,17 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
                 <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Belum Update</h4>
-                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($statusPending ?? 20) ?></h2>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Dari <?= esc($totalMonitoring ?? 90) ?> Item</p>
+                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($statusPending ?? 0) ?></h2>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Dari <?= esc($totalMonitoring ?? 0) ?> Item</p>
             </div>
             <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #fee2e2; display: flex; align-items: center; justify-content: center; color: var(--danger); font-size: 1.25rem;">
                 <i class="bi bi-exclamation-lg" style="stroke: currentColor; stroke-width: 1;"></i>
             </div>
         </div>
         <div style="margin-top: 1rem;">
+            <?php $percentPending = $totalMonitoring > 0 ? round(($statusPending / $totalMonitoring) * 100) : 0; ?>
             <div style="height: 6px; width: 100%; background-color: var(--neutral-light); border-radius: 3px; overflow: hidden; margin-bottom: 0.75rem;">
-                <div style="height: 100%; width: 22%; background-color: var(--danger); border-radius: 3px;"></div>
+                <div style="height: 100%; width: <?= $percentPending ?>%; background-color: var(--danger); border-radius: 3px;"></div>
             </div>
         </div>
     </div>
@@ -82,7 +88,7 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
                 <h4 style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Total Item</h4>
-                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($totalMonitoring ?? 90) ?></h2>
+                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin: 0; line-height: 1;"><?= esc($totalMonitoring ?? 0) ?></h2>
                 <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Item Informasi</p>
             </div>
             <div style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--secondary); display: flex; align-items: center; justify-content: center; color: var(--primary-light); font-size: 1.25rem;">
@@ -102,9 +108,6 @@
             <i class="bi bi-bar-chart-fill" style="font-size: 1.25rem;"></i>
             <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0;">Presentase Kepatuhan Per Kategori</h3>
         </div>
-        <select class="select-control" style="width: auto; padding: 0.35rem 2.25rem 0.35rem 1rem; border-color: var(--neutral-light); color: var(--primary); font-size: 0.85rem; border-radius: var(--br-full); background-color: var(--white); font-weight: 500;">
-            <option>Semua Kategori</option>
-        </select>
     </div>
     <div style="position: relative; height: 320px; width: 100%; padding: 0 1rem;">
         <canvas id="barChartCanvas"></canvas>
@@ -118,7 +121,7 @@
             <div style="background-color: var(--danger); color: var(--white); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">!</div>
             <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0;">Item Belum Update</h3>
         </div>
-        <a href="<?= base_url('monitoring') ?>" class="btn btn-secondary btn-sm" style="border-radius: var(--br-full); padding: 0.35rem 1rem; font-size: 0.8rem; font-weight: 600; color: var(--primary); border-color: var(--neutral-light);">
+        <a href="<?= base_url("monitoring?year={$selectedYear}&triwulan={$selectedTriwulan}&status=pending") ?>" class="btn btn-secondary btn-sm" style="border-radius: var(--br-full); padding: 0.35rem 1rem; font-size: 0.8rem; font-weight: 600; color: var(--primary); border-color: var(--neutral-light);">
             Lihat Semua <i class="bi bi-arrow-right"></i>
         </a>
     </div>
@@ -137,46 +140,28 @@
                 $hasPending = false;
                 if (isset($recentMonitoring) && !empty($recentMonitoring)): 
                     foreach ($recentMonitoring as $item): 
-                        if ($item['status'] !== 'completed'): 
-                            $hasPending = true;
+                        $hasPending = true;
                 ?>
-                            <tr>
-                                <td style="padding: 1rem;">
-                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                        <i class="bi bi-exclamation-triangle" style="color: var(--danger); font-size: 1.1rem;"></i>
-                                        <span style="font-weight: 500; color: var(--text-dark); font-size: 0.9rem;"><?= esc($item['title']) ?></span>
-                                    </div>
-                                </td>
-                                <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;"><?= esc($item['category_name']) ?></td>
-                                <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;"><?= esc($item['description'] ?: '-') ?></td>
-                            </tr>
+                        <tr>
+                            <td style="padding: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <i class="bi bi-exclamation-triangle" style="color: var(--danger); font-size: 1.1rem;"></i>
+                                    <span style="font-weight: 500; color: var(--text-dark); font-size: 0.9rem;"><?= esc($item['title']) ?></span>
+                                </div>
+                            </td>
+                            <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;"><?= esc($item['category_name'] ?: '-') ?></td>
+                            <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;"><?= esc($item['description'] ?: '-') ?></td>
+                        </tr>
                 <?php 
-                        endif;
                     endforeach;
                 endif; 
                 ?>
                 
                 <?php if (!$hasPending): ?>
-                    <!-- Mock Data fallback if no pending items -->
                     <tr>
-                        <td style="padding: 1rem;">
-                            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                <i class="bi bi-exclamation-triangle" style="color: var(--danger); font-size: 1.1rem;"></i>
-                                <span style="font-weight: 500; color: var(--text-dark); font-size: 0.9rem;">Struktur Organisasi</span>
-                            </div>
+                        <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                            Semua informasi pada Triwulan ini telah diperbarui!
                         </td>
-                        <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">Profil PPID</td>
-                        <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">-</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 1rem;">
-                            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                <i class="bi bi-exclamation-triangle" style="color: var(--danger); font-size: 1.1rem;"></i>
-                                <span style="font-weight: 500; color: var(--text-dark); font-size: 0.9rem;">Registrasi Permintaan Informasi</span>
-                            </div>
-                        </td>
-                        <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">Laporan</td>
-                        <td style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">-</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
@@ -196,7 +181,7 @@
             const dataVals = chartData.map(item => item.total);
         <?php else: ?>
             const labels = ['Profil PPID', 'Regulasi', 'Laporan', 'Standar Layanan', 'Informasi Publik', 'Layanan Informasi', 'Keuangan', 'Pengelolaan Informasi'];
-            const dataVals = [100, 90, 75, 80, 70, 60, 50, 40];
+            const dataVals = [0, 0, 0, 0, 0, 0, 0, 0];
         <?php endif; ?>
         
         new Chart(barCtx, {
