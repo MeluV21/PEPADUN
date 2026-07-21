@@ -520,7 +520,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                 </div>
                 <div class="col-md-4">
                     <div class="info-status-card">
-                        <div class="icon-status status-danger"><i class="bi bi-x-circle"></i></div>
+                        <div class="icon-status status-danger"><i class="bi bi-exclamation-circle"></i></div>
                         <div>
                             <h5>Belum Update</h5>
                             <p>Bidang belum memperbarui dokumen informasi pada triwulan berjalan.</p>
@@ -569,9 +569,7 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
         <!-- Apa itu PEPADUN? -->
         <div class="row mt-5 pt-4 align-items-center">
             <div class="col-md-4 text-center mb-4 mb-md-0">
-                <img src="<?= base_url('images/logo_text.png'); ?>" alt="Logo PEPADUN" class="tentang-logo-img mb-2" style="max-height: 90px; object-fit: contain;">
-                <h4 class="fw-bold mb-1 mt-3" style="color: #0d47a1; letter-spacing: 1px;">PEPADUN</h4>
-                <p class="text-secondary small mb-0" style="font-size: 11px;">Percepatan Pantau Dokumen serta<br>Update Data dan Informasi</p>
+                <img src="<?= base_url('images/logo_pepadun.png'); ?>" alt="Logo PEPADUN" class="tentang-logo-img mb-2" style="max-height: 120px; object-fit: contain;">
             </div>
             <div class="col-md-8 pl-md-5">
                 <div class="ps-md-4 border-start border-2 border-primary-subtle" style="border-left-color: #0d47a1 !important; border-left-width: 3px !important;">

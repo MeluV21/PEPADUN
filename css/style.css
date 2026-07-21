@@ -504,7 +504,8 @@ table.custom-table tbody tr:hover {
 }
 
 .sidebar-brand-wrapper img {
-    width: 32px;
+    width: auto;
+    max-width: 100%;
     height: auto;
 }
 

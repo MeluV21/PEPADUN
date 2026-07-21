@@ -24,7 +24,7 @@
             </a>
 
             <div class="auth-brand">
-                <img src="<?= base_url('images/logo_text.png') ?>" alt="Logo BPOM">
+                <img src="<?= base_url('images/logo_pepadun.png') ?>" alt="Logo PEPADUN">
                 
                 <h2 class="auth-title">Selamat Datang</h2>
                 <p class="auth-subtitle">Silakan masuk untuk melanjutkan ke sistem<br>PEPADUN BBPOM di Bandar Lampung</p>

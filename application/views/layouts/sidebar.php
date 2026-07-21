@@ -6,14 +6,12 @@
             <i class="bi bi-layout-sidebar"></i>
         </button>
 
-        <div class="sidebar-brand-wrapper" id="sidebarBrand">
-            <img src="<?= base_url('images/logo_only.png') ?>" alt="Logo BADAN POM">
-            <div>
-                <h1 style="font-size: 1.25rem; margin: 0; line-height: 1.2;">PEPADUN</h1>
+        <div style="display: flex; flex-direction: column; align-items: stretch; width: 100%; max-width: 210px; margin: 0 auto; gap: 8px;">
+            <div class="sidebar-brand-wrapper" id="sidebarBrand" style="justify-content: center; margin-bottom: 0;">
+                <img src="<?= base_url('images/logo_pepadun.png') ?>" alt="Logo PEPADUN" style="width: 100%; height: auto; object-fit: contain;">
             </div>
+            <span class="sidebar-badge" style="text-align: center; white-space: nowrap; padding: 0.4rem 0.6rem;">BBPOM di Bandar Lampung</span>
         </div>
-        <span class="sidebar-brand-desc">Percepatan Pantau Dokumen serta Update Data dan Informasi</span>
-        <span class="sidebar-badge">BBPOM di Bandar Lampung</span>
     </div>
 
     <!-- Navigation Menu -->
