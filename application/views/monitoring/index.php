@@ -18,7 +18,7 @@
 
 <!-- Filtering and Search Bar matching Mockup exactly on a single line -->
 <div class="card" style="margin-bottom: 2rem; padding: 1rem 1.25rem;">
-    <form action="<?= base_url('monitoring') ?>" method="GET">
+    <form action="<?= base_url('monitoring') ?>" method="GET" id="filterForm" onsubmit="event.preventDefault(); submitFilters();">
         <!-- Preserve year and triwulan states -->
         <input type="hidden" name="year" value="<?= esc($selectedYear) ?>">
         <input type="hidden" name="triwulan" value="<?= esc($selectedTriwulan) ?>">
@@ -28,12 +28,12 @@
             <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                 <!-- Search input -->
                 <div class="input-icon-wrapper" style="width: 200px; margin-bottom: 0;">
-                    <input type="text" id="search" name="search" class="form-control form-control-icon" placeholder="Cari informasi..." value="<?= esc($searchQuery ?? '') ?>" autocomplete="off" style="padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.85rem;" onkeypress="if(event.keyCode === 13) { this.form.submit(); return false; }">
-                    <i class="bi bi-search" style="font-size: 0.95rem;"></i>
+                    <input type="text" id="search" name="search" class="form-control form-control-icon" placeholder="Cari informasi..." value="<?= esc($searchQuery ?? '') ?>" autocomplete="off" style="padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.85rem;" onkeypress="if(event.keyCode === 13) { submitFilters(); return false; }">
+                    <i class="bi bi-search" id="searchIcon" style="font-size: 0.95rem; cursor: pointer;" onclick="submitFilters()"></i>
                 </div>
 
                 <!-- Category filter dropdown -->
-                <select id="category" name="category" class="select-control" onchange="this.form.submit()" style="width: 170px; padding: 0.5rem 2.5rem 0.5rem 0.75rem; font-size: 0.85rem;">
+                <select id="category" name="category" class="select-control" onchange="submitFilters()" style="width: 170px; padding: 0.5rem 2.5rem 0.5rem 0.75rem; font-size: 0.85rem;">
                     <option value="">Semua Kategori</option>
                     <?php foreach ($categories as $cat): 
                         if (strtolower(trim($cat['name'])) === 'tanpa kategori') continue;
@@ -45,7 +45,7 @@
                 </select>
 
                 <!-- Status filter dropdown -->
-                <select id="status" name="status" class="select-control" onchange="this.form.submit()" style="width: 170px; padding: 0.5rem 2.5rem 0.5rem 0.75rem; font-size: 0.85rem;">
+                <select id="status" name="status" class="select-control" onchange="submitFilters()" style="width: 170px; padding: 0.5rem 2.5rem 0.5rem 0.75rem; font-size: 0.85rem;">
                     <option value="">Semua Status</option>
                     <option value="pending" <?= ($selectedStatus == 'pending') ? 'selected' : '' ?>>Belum Update</option>
                     <option value="progress" <?= ($selectedStatus == 'progress') ? 'selected' : '' ?>>Dalam Proses</option>
@@ -54,7 +54,7 @@
                 
                 <!-- Action buttons for filtering -->
                 <?php if (!empty($searchQuery) || !empty($selectedCategory) || !empty($selectedStatus)): ?>
-                    <a href="<?= base_url("monitoring?year={$selectedYear}&triwulan={$selectedTriwulan}") ?>" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    <a href="<?= base_url("monitoring?year={$selectedYear}&triwulan={$selectedTriwulan}") ?>" class="btn btn-secondary reset-filter-btn" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
                         Reset Filter
                     </a>
                 <?php endif; ?>
@@ -80,10 +80,10 @@
                     <!-- padding-top is used to bridge the hover gap between button and menu -->
                     <div class="export-menu" style="display: none; position: absolute; right: 0; top: 100%; min-width: 140px; z-index: 10; padding-top: 5px;">
                         <div style="background-color: #fff; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; padding: 0.5rem 0;">
-                            <a href="<?= base_url('monitoring/export_excel?' . $exportQuery) ?>" style="color: #334155; padding: 8px 16px; text-decoration: none; display: block; font-size: 0.85rem; font-weight: 500;" onmouseover="this.style.backgroundColor='#f1f5f9'" onmouseout="this.style.backgroundColor='transparent'">
+                            <a href="<?= base_url('monitoring/export_excel?' . $exportQuery) ?>" id="exportExcelBtn" style="color: #334155; padding: 8px 16px; text-decoration: none; display: block; font-size: 0.85rem; font-weight: 500;" onmouseover="this.style.backgroundColor='#f1f5f9'" onmouseout="this.style.backgroundColor='transparent'">
                                 <i class="bi bi-file-earmark-excel" style="color: #10b981; margin-right: 5px;"></i> Excel
                             </a>
-                            <a href="<?= base_url('monitoring/export_pdf?' . $exportQuery) ?>" target="_blank" style="color: #334155; padding: 8px 16px; text-decoration: none; display: block; font-size: 0.85rem; font-weight: 500;" onmouseover="this.style.backgroundColor='#f1f5f9'" onmouseout="this.style.backgroundColor='transparent'">
+                            <a href="<?= base_url('monitoring/export_pdf?' . $exportQuery) ?>" id="exportPdfBtn" target="_blank" style="color: #334155; padding: 8px 16px; text-decoration: none; display: block; font-size: 0.85rem; font-weight: 500;" onmouseover="this.style.backgroundColor='#f1f5f9'" onmouseout="this.style.backgroundColor='transparent'">
                                 <i class="bi bi-file-earmark-pdf" style="color: #ef4444; margin-right: 5px;"></i> PDF
                             </a>
                         </div>
@@ -161,7 +161,21 @@
                             ?>
                             <div style="display: inline-flex; gap: 0.75rem; align-items: center; vertical-align: middle;">
                                 <?php if ($canModify): ?>
-                                    <button type="button" onclick="openEditModal(<?= $item['id'] ?>, <?= $selectedYear ?>, <?= $selectedTriwulan ?>, '<?= addslashes(esc($item['custom_name'] ?: $item['name'])) ?>', '<?= addslashes(esc($item['status'] ?: 'pending')) ?>', '<?= addslashes(esc($item['pj'] ?: '')) ?>', '<?= addslashes(esc(preg_replace("/\r|\n/", "\\n", $item['description'] ?: ''))) ?>', '<?= $item['category_id'] ?>', '<?= $item['timeline'] ?>', '<?= addslashes(esc($item['tautan'] ?: '')) ?>')" title="Update Status" style="border: none; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #F0F5FF; color: #2563EB; border-radius: 10px; transition: all 0.2s;">
+                                    <?php
+                                    $modalData = [
+                                        'id' => $item['id'],
+                                        'year' => $selectedYear,
+                                        'triwulan' => $selectedTriwulan,
+                                        'custom_name' => $item['custom_name'] ?: $item['name'],
+                                        'status' => $item['status'] ?: 'pending',
+                                        'pj' => $item['pj'] ?: '',
+                                        'description' => $item['description'] ?: '',
+                                        'category_id' => $item['category_id'],
+                                        'timeline' => $item['timeline'],
+                                        'tautan' => $item['tautan'] ?: ''
+                                    ];
+                                    ?>
+                                    <button type="button" onclick='openEditModal(<?= htmlspecialchars(json_encode($modalData), ENT_QUOTES, "UTF-8") ?>)' title="Update Status" style="border: none; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #F0F5FF; color: #2563EB; border-radius: 10px; transition: all 0.2s;">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <button type="button" onclick="openDeleteModal(<?= $item['id'] ?>, <?= $selectedYear ?>, <?= $selectedTriwulan ?>)" title="Hapus Laporan" style="border: none; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; font-size: 1.1rem; background-color: #FFF0F0; color: #EF4444; border-radius: 10px; transition: all 0.2s;">
@@ -238,12 +252,12 @@
             return base_url('monitoring') . '?' . http_build_query($params);
         };
     ?>
-<div class="pagination-wrapper" style="justify-content: space-between;">
-    <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500;">
+<div class="pagination-wrapper" style="justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; margin-bottom: 0.5rem;">
         Menampilkan <?= $startItem ?> - <?= $endItem ?> dari <?= $totalRows ?> data
     </div>
     
-    <div class="pagination-pages">
+    <div class="pagination-pages" style="display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
         <a href="<?= $build_page_url(1) ?>" class="pagination-page-btn" title="First Page" <?= $currentPage <= 1 ? 'style="pointer-events:none; opacity:0.5;"' : '' ?>>
             <i class="bi bi-chevron-double-left"></i>
         </a>
@@ -254,12 +268,19 @@
         <?php
             $startPage = max(1, $currentPage - 2);
             $endPage = min($totalPages, $currentPage + 2);
-            if ($startPage > 1) echo '<button class="pagination-page-btn" disabled style="cursor: default; border-color: transparent;">...</button>';
+            
+            if ($startPage > 1) {
+                echo '<button class="pagination-page-btn d-none d-sm-inline-block" disabled style="cursor: default; border-color: transparent;">...</button>';
+            }
+            
             for ($p = $startPage; $p <= $endPage; $p++) {
-                $activeClass = $p === $currentPage ? 'active' : '';
+                $activeClass = $p === $currentPage ? 'active' : 'd-none d-sm-inline-block';
                 echo '<a href="'.$build_page_url($p).'" class="pagination-page-btn '.$activeClass.'" style="text-decoration:none;">'.$p.'</a>';
             }
-            if ($endPage < $totalPages) echo '<button class="pagination-page-btn" disabled style="cursor: default; border-color: transparent;">...</button>';
+            
+            if ($endPage < $totalPages) {
+                echo '<button class="pagination-page-btn d-none d-sm-inline-block" disabled style="cursor: default; border-color: transparent;">...</button>';
+            }
         ?>
         
         <a href="<?= $build_page_url(min($totalPages, $currentPage + 1)) ?>" class="pagination-page-btn" title="Next Page" <?= $currentPage >= $totalPages ? 'style="pointer-events:none; opacity:0.5;"' : '' ?>>
@@ -319,6 +340,7 @@
                         <option value="Mingguan">Mingguan</option>
                         <option value="Bulanan">Bulanan</option>
                         <option value="Triwulan">Triwulan</option>
+                        <option value="Semester">Semester</option>
                         <option value="Tahunan">Tahunan</option>
                     </select>
                 </div>
@@ -405,6 +427,7 @@
                         <option value="Mingguan">Mingguan</option>
                         <option value="Bulanan">Bulanan</option>
                         <option value="Triwulan">Triwulan</option>
+                        <option value="Semester">Semester</option>
                         <option value="Tahunan">Tahunan</option>
                     </select>
                 </div>
@@ -478,27 +501,27 @@
     const tambahModal = document.getElementById('tambahDataModal');
     const editModal = document.getElementById('editDataModal');
     
-    function openEditModal(masterId, year, triwulan, customName, status, pj, desc, categoryId, timeline, tautan) {
-        document.getElementById('editForm').action = `<?= base_url('monitoring/update') ?>/${masterId}/${year}/${triwulan}`;
-        document.getElementById('edit_custom_name').value = customName;
-        document.getElementById('edit_status').value = status || 'pending';
+    function openEditModal(data) {
+        document.getElementById('editForm').action = `<?= base_url('monitoring/update') ?>/${data.id}/${data.year}/${data.triwulan}`;
+        document.getElementById('edit_custom_name').value = data.custom_name;
+        document.getElementById('edit_status').value = data.status || 'pending';
         
         if(window.tsEdit) {
-            if(pj && pj.trim() !== '') {
-                window.tsEdit.addOption({value: pj, text: pj});
-                window.tsEdit.setValue(pj);
+            if(data.pj && data.pj.trim() !== '') {
+                window.tsEdit.addOption({value: data.pj, text: data.pj});
+                window.tsEdit.setValue(data.pj);
             } else {
                 window.tsEdit.clear();
             }
         }
         
-        document.getElementById('edit_description').value = desc || '';
-        document.getElementById('edit_category').value = categoryId || '';
-        document.getElementById('edit_timeline').value = timeline || '';
-        document.getElementById('edit_tautan').value = tautan || '';
+        document.getElementById('edit_description').value = data.description || '';
+        document.getElementById('edit_category').value = data.category_id || '';
+        document.getElementById('edit_timeline').value = data.timeline || '';
+        document.getElementById('edit_tautan').value = data.tautan || '';
         
-        let triwulanRoman = triwulan == 1 ? 'I' : (triwulan == 2 ? 'II' : (triwulan == 3 ? 'III' : 'IV'));
-        document.getElementById('editModalSubtitle').innerHTML = `Mengupdate data untuk <strong style="color: #0c3d79;">Triwulan ${triwulanRoman} Tahun ${year}</strong>`;
+        let triwulanRoman = data.triwulan == 1 ? 'I' : (data.triwulan == 2 ? 'II' : (data.triwulan == 3 ? 'III' : 'IV'));
+        document.getElementById('editModalSubtitle').innerHTML = `Mengupdate data untuk <strong style="color: #0c3d79;">Triwulan ${triwulanRoman} Tahun ${data.year}</strong>`;
         
         if(editModal) editModal.classList.add('show');
     }
@@ -526,98 +549,144 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-        const searchInput = document.getElementById('search');
-        const searchIcon = document.getElementById('searchIcon');
-        const categorySelect = document.getElementById('category');
-        
         let debounceTimer;
 
-        // Restore focus if it was focused before form submission
-        if (sessionStorage.getItem('searchFocus') === '1' && searchInput) {
-            searchInput.focus();
-            const val = searchInput.value;
-            searchInput.value = '';
-            searchInput.value = val;
-            sessionStorage.removeItem('searchFocus');
-        } else if (searchInput && searchInput.value !== '') {
-            // Also focus if there's a search value (user arrived from a search link)
-            searchInput.focus();
-            const val = searchInput.value;
-            searchInput.value = '';
-            searchInput.value = val;
-        }
-
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
+        // Use event delegation for input so it survives DOM replacement
+        document.addEventListener('input', function(e) {
+            if (e.target && e.target.id === 'search') {
                 clearTimeout(debounceTimer);
                 
-                // If it is completely cleared, submit immediately to show all data
-                if (this.value === '') {
-                    sessionStorage.setItem('searchFocus', '1');
-                    this.form.submit();
+                if (e.target.value === '') {
+                    submitFilters();
                     return;
                 }
                 
-                // Debounce search: submit form after 600ms of no typing
                 debounceTimer = setTimeout(() => {
-                    sessionStorage.setItem('searchFocus', '1');
-                    this.form.submit();
+                    submitFilters();
                 }, 600);
-            });
-            
-            // If they press Enter, remember focus
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    sessionStorage.setItem('searchFocus', '1');
-                }
-            });
-        }
+            }
+        });
 
-        if (searchIcon && searchInput) {
-            searchIcon.addEventListener('click', function() {
-                sessionStorage.setItem('searchFocus', '1');
-                searchInput.form.submit();
-            });
-        }
+        // Handle pagination clicks and triwulan tabs and reset filter button via AJAX
+        document.addEventListener('click', function(e) {
+            const paginationLink = e.target.closest('.pagination-page-btn');
+            const tabBtn = e.target.closest('.triwulan-tab-btn');
+            const resetBtn = e.target.closest('.reset-filter-btn');
 
-        if (categorySelect) {
-            // Auto submit when category is selected
-            categorySelect.addEventListener('change', function() {
-                this.form.submit();
-            });
-            
-            // Allow Enter key to submit on select dropdown as well
-            categorySelect.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.form.submit();
-                }
-            });
-        }
-        
-        const statusSelect = document.getElementById('status');
-        if (statusSelect) {
-            statusSelect.addEventListener('change', function() {
-                this.form.submit();
-            });
-            statusSelect.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.form.submit();
-                }
-            });
-        }
-        
-        const perPageSelect = document.getElementById('perPageSelect');
-        if (perPageSelect) {
-            perPageSelect.addEventListener('change', function() {
+            if (paginationLink && paginationLink.tagName === 'A' && !paginationLink.hasAttribute('disabled')) {
+                e.preventDefault();
+                loadMonitoringData(paginationLink.href);
+            } else if (tabBtn && tabBtn.tagName === 'A') {
+                e.preventDefault();
+                document.querySelectorAll('.triwulan-tab-btn').forEach(b => b.classList.remove('active'));
+                tabBtn.classList.add('active');
+                loadMonitoringData(tabBtn.href);
+            } else if (resetBtn && resetBtn.tagName === 'A') {
+                e.preventDefault();
+                loadMonitoringData(resetBtn.href);
+            }
+        });
+
+        // Handle perPageSelect changes via event delegation
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.id === 'perPageSelect') {
                 const urlParams = new URLSearchParams(window.location.search);
-                urlParams.set('per_page', this.value);
+                urlParams.set('per_page', e.target.value);
                 urlParams.set('page', '1');
-                window.location.search = urlParams.toString();
-            });
-        }
+                const url = window.location.pathname + '?' + urlParams.toString();
+                loadMonitoringData(url);
+            }
+        });
+
+        // Handle back/forward buttons
+        window.addEventListener('popstate', function() {
+            loadMonitoringData(window.location.href, false);
+        });
     });
+
+    window.submitFilters = function() {
+        const form = document.getElementById('filterForm');
+        if (!form) return;
+        const url = new URL(form.action);
+        const formData = new FormData(form);
+        for (const [key, value] of formData.entries()) {
+            if (value) {
+                url.searchParams.append(key, value);
+            }
+        }
+        // Always reset to page 1 on filter
+        url.searchParams.delete('page');
+        
+        loadMonitoringData(url.toString());
+    };
+
+    function loadMonitoringData(url, pushState = true) {
+        const tbody = document.querySelector('.table-responsive tbody');
+        if (tbody) tbody.style.opacity = '0.5';
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Extract and restore focus if the active element is inside the form
+            const activeElementId = document.activeElement ? document.activeElement.id : null;
+            const selectionStart = document.activeElement && document.activeElement.tagName === 'INPUT' ? document.activeElement.selectionStart : null;
+            const selectionEnd = document.activeElement && document.activeElement.tagName === 'INPUT' ? document.activeElement.selectionEnd : null;
+
+            // 1. Update Tabs
+            const currentTabs = document.querySelector('.triwulan-tabs-container');
+            const newTabs = doc.querySelector('.triwulan-tabs-container');
+            if (currentTabs && newTabs) {
+                currentTabs.innerHTML = newTabs.innerHTML;
+            }
+
+            // 2. Update Filter Form Area
+            const currentFormContainer = document.querySelector('.card form').parentNode;
+            const newFormContainer = doc.querySelector('.card form').parentNode;
+            if (currentFormContainer && newFormContainer) {
+                currentFormContainer.innerHTML = newFormContainer.innerHTML;
+            }
+
+            // 3. Update Table Body
+            const newTbody = doc.querySelector('.table-responsive tbody');
+            if (newTbody) tbody.innerHTML = newTbody.innerHTML;
+            tbody.style.opacity = '1';
+
+            // 4. Update Pagination
+            const currentPagination = document.querySelector('.pagination-wrapper');
+            const newPagination = doc.querySelector('.pagination-wrapper');
+            
+            if (currentPagination && newPagination) {
+                currentPagination.innerHTML = newPagination.innerHTML;
+            } else if (!currentPagination && newPagination) {
+                document.querySelector('.table-responsive').insertAdjacentElement('afterend', newPagination);
+            } else if (currentPagination && !newPagination) {
+                currentPagination.remove();
+            }
+
+            // Restore focus
+            if (activeElementId) {
+                const el = document.getElementById(activeElementId);
+                if (el) {
+                    el.focus();
+                    if (el.tagName === 'INPUT' && selectionStart !== null) {
+                        el.setSelectionRange(selectionStart, selectionEnd);
+                    }
+                }
+            }
+
+            // Update URL
+            if (pushState) {
+                window.history.pushState({path: url}, '', url);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            if (tbody) tbody.style.opacity = '1';
+        });
+    }
 </script>
 
 <!-- Delete Choice Modal -->

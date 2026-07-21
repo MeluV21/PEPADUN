@@ -7,8 +7,8 @@ class Landing extends CI_Controller {
         $this->load->database();
         $db = $this->db;
         
-        $currentYear = date('Y');
-        $currentTriwulan = ceil(date('m') / 3);
+        $currentYear = $this->input->get('year') ? (int)$this->input->get('year') : (int)date('Y');
+        $currentTriwulan = $this->input->get('triwulan') ? (int)$this->input->get('triwulan') : (int)ceil(date('m') / 3);
 
         $queryTotal = $db->query("
             SELECT COUNT(mi.id) as total

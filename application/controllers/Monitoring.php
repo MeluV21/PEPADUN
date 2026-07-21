@@ -132,7 +132,7 @@ class Monitoring extends Auth_Controller {
 
         $this->form_validation->set_rules('name', 'Nama Informasi', 'required|min_length[3]|max_length[255]');
         $this->form_validation->set_rules('category_id', 'Kategori', 'required|trim');
-        $this->form_validation->set_rules('timeline', 'Timeline', 'required|in_list[Realtime,Harian,Mingguan,Bulanan,Triwulan,Tahunan]');
+        $this->form_validation->set_rules('timeline', 'Timeline', 'required|in_list[Realtime,Harian,Mingguan,Bulanan,Triwulan,Semester,Tahunan]');
         $this->form_validation->set_rules('status', 'Status', 'required|in_list[pending,progress,completed]');
         $this->form_validation->set_rules('tautan', 'Tautan', 'required|valid_url');
 
@@ -171,6 +171,28 @@ class Monitoring extends Auth_Controller {
             'created_by'  => session()->get('id_user'),
             'is_deleted'  => 0
         ]);
+
+        // --- WHATSAPP NOTIFICATION LOGIC ---
+        if (!empty($pj)) {
+            $this->load->model('User_model');
+            $user = $this->User_model->where('nama', $pj)->first();
+            if ($user && !empty($user['telp'])) {
+                if ($status == 'pending' || $status == 'progress') {
+                    $status_indo = '';
+                    if ($status == 'pending') $status_indo = 'Belum Update';
+                    else if ($status == 'progress') $status_indo = 'Dalam Proses';
+                    
+                    $infoName = $this->input->post('name');
+                    $wa_message = "Halo *" . $user['nama'] . "*,\n\nAda tugas/informasi baru untuk Anda:\n"
+                                . "Kegiatan: *" . $infoName . "*\n"
+                                . "Status: *" . $status_indo . "*\n\n"
+                                . "Silakan cek di sistem Monitoring.";
+                    
+                    $this->_send_whatsapp($user['telp'], $wa_message);
+                }
+            }
+        }
+        // ------------------------------------
 
         session()->setFlashdata('success', 'Informasi baru dan status perkembangannya berhasil ditambahkan.');
         redirect("monitoring?year={$year}&triwulan={$triwulan}");
@@ -231,7 +253,7 @@ class Monitoring extends Auth_Controller {
         $this->form_validation->set_rules('status', 'Status', 'required|in_list[pending,progress,completed]');
         $this->form_validation->set_rules('custom_name', 'Nama Informasi', 'required');
         $this->form_validation->set_rules('category_id', 'Kategori', 'required|trim');
-        $this->form_validation->set_rules('timeline', 'Timeline', 'required|in_list[Realtime,Harian,Mingguan,Bulanan,Triwulan,Tahunan]');
+        $this->form_validation->set_rules('timeline', 'Timeline', 'required|in_list[Realtime,Harian,Mingguan,Bulanan,Triwulan,Semester,Tahunan]');
         $this->form_validation->set_rules('tautan', 'Tautan', 'required|valid_url');
         
         if ($this->form_validation->run() === FALSE) {
@@ -271,7 +293,31 @@ class Monitoring extends Auth_Controller {
             $monitoringModel->save($saveData);
         }
 
-        session()->setFlashdata('success', 'Status monitoring berhasil diperbarui.');
+        $infoName = $this->input->post('custom_name');
+        
+        // --- WHATSAPP NOTIFICATION LOGIC ---
+        $pjName = $this->input->post('pj');
+        if (!empty($pjName)) {
+            $this->load->model('User_model');
+            $user = $this->User_model->where('nama', $pjName)->first();
+            if ($user && !empty($user['telp'])) {
+                if ($saveData['status'] == 'pending' || $saveData['status'] == 'progress') {
+                    $status_indo = '';
+                    if ($saveData['status'] == 'pending') $status_indo = 'Belum Update';
+                    else if ($saveData['status'] == 'progress') $status_indo = 'Dalam Proses';
+                    
+                    $wa_message = "Halo *" . $user['nama'] . "*,\n\nAda update status untuk kegiatan Anda:\n"
+                                . "Kegiatan: *" . $infoName . "*\n"
+                                . "Status Baru: *" . $status_indo . "*\n\n"
+                                . "Silakan cek di sistem Monitoring.";
+                    
+                    $this->_send_whatsapp($user['telp'], $wa_message);
+                }
+            }
+        }
+        // ------------------------------------
+
+        session()->setFlashdata('success', "\"$infoName\" berhasil diperbarui.");
         redirect("monitoring?year={$year}&triwulan={$triwulan}");
     }
 
@@ -409,5 +455,23 @@ class Monitoring extends Auth_Controller {
         $data['triwulan'] = $this->input->get('triwulan') !== NULL ? $this->input->get('triwulan') : ceil(date('m') / 3);
         
         $this->load->view('monitoring/export_pdf', $data);
+    }
+    private function _send_whatsapp($number, $message) {
+        $data = [
+            'number' => $number,
+            'message' => $message
+        ];
+
+        $ch = curl_init('http://localhost:3000/send-message');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        
+        $response = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        return json_decode($response, true);
     }
 }

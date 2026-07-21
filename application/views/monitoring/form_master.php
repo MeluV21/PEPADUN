@@ -46,6 +46,7 @@
                 <option value="Mingguan" <?= old('timeline') == 'Mingguan' ? 'selected' : '' ?>>Mingguan</option>
                 <option value="Bulanan" <?= old('timeline') == 'Bulanan' ? 'selected' : '' ?>>Bulanan</option>
                 <option value="Triwulan" <?= old('timeline') == 'Triwulan' ? 'selected' : '' ?>>Triwulan</option>
+                <option value="Semester" <?= old('timeline') == 'Semester' ? 'selected' : '' ?>>Semester</option>
                 <option value="Tahunan" <?= old('timeline') == 'Tahunan' ? 'selected' : '' ?>>Tahunan</option>
             </select>
         </div>

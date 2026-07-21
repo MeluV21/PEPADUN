@@ -34,29 +34,14 @@
                 </button>
 
                 <ul class="dropdown-menu">
+                    <?php for ($t = 1; $t <= 4; $t++): ?>
                     <li>
-                        <a class="dropdown-item" href="#">
-                            Triwulan I Tahun <?= date('Y') ?>
+                        <a class="dropdown-item <?= ((int)$currentTriwulanNum === $t) ? 'active' : '' ?>" 
+                           href="<?= base_url("landing?year={$currentYearNum}&triwulan={$t}") ?>">
+                            Triwulan <?= $triwulanRoman[$t] ?> Tahun <?= $currentYearNum ?>
                         </a>
                     </li>
-
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            Triwulan II Tahun <?= date('Y') ?>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            Triwulan III Tahun <?= date('Y') ?>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            Triwulan IV Tahun <?= date('Y') ?>
-                        </a>
-                    </li>
+                    <?php endfor; ?>
                 </ul>
             </div>
 
@@ -217,11 +202,11 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                     <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                         <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                             <div class="input-icon-wrapper" style="width: 200px; margin-bottom: 0; position: relative;">
-                                <input type="text" id="search" name="search" class="form-control form-control-icon" placeholder="Cari informasi..." value="<?= esc($searchQuery ?? '') ?>" autocomplete="off" style="padding-top: 0.5rem; padding-bottom: 0.5rem; padding-left: 2.25rem; font-size: 0.85rem;" onkeypress="if(event.keyCode === 13) { this.form.submit(); return false; }">
+                                <input type="text" id="search" name="search" class="form-control form-control-icon" placeholder="Cari informasi..." value="<?= esc($searchQuery ?? '') ?>" autocomplete="off" style="padding-top: 0.5rem; padding-bottom: 0.5rem; padding-left: 2.25rem; font-size: 0.85rem;" onkeypress="if(event.keyCode === 13) { event.preventDefault(); submitFilters(); return false; }">
                                 <i class="bi bi-search" style="font-size: 0.95rem; position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
                             </div>
 
-                            <select id="category" name="category" class="select-control form-select" onchange="this.form.submit()" style="width: 170px; padding: 0.5rem 2.25rem 0.5rem 0.75rem; font-size: 0.85rem;">
+                            <select id="category" name="category" class="select-control form-select" onchange="submitFilters()" style="width: 170px; padding: 0.5rem 2.25rem 0.5rem 0.75rem; font-size: 0.85rem;">
                                 <option value="">Semua Kategori</option>
                                 <?php foreach ($categories as $cat): 
                                     if (strtolower(trim($cat['name'])) === 'tanpa kategori') continue;
@@ -232,18 +217,16 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                                 <?php endforeach; ?>
                             </select>
 
-                            <select id="status" name="status" class="select-control form-select" onchange="this.form.submit()" style="width: 170px; padding: 0.5rem 2.25rem 0.5rem 0.75rem; font-size: 0.85rem;">
+                            <select id="status" name="status" class="select-control form-select" onchange="submitFilters()" style="width: 170px; padding: 0.5rem 2.25rem 0.5rem 0.75rem; font-size: 0.85rem;">
                                 <option value="">Semua Status</option>
                                 <option value="pending" <?= ($selectedStatus == 'pending') ? 'selected' : '' ?>>Belum Update</option>
                                 <option value="progress" <?= ($selectedStatus == 'progress') ? 'selected' : '' ?>>Dalam Proses</option>
                                 <option value="completed" <?= ($selectedStatus == 'completed') ? 'selected' : '' ?>>Selesai (Completed)</option>
                             </select>
                             
-                            <?php if (!empty($searchQuery) || !empty($selectedCategory) || !empty($selectedStatus)): ?>
-                                <a href="<?= base_url('landing') ?>#monitoring-data" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem; background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">
-                                    Reset Filter
-                                </a>
-                            <?php endif; ?>
+                            <a href="<?= base_url('landing') ?>#monitoring-data" id="resetFilterBtn" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem; background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; <?= (!empty($searchQuery) || !empty($selectedCategory) || !empty($selectedStatus)) ? '' : 'display: none;' ?>">
+                                Reset Filter
+                            </a>
                         </div>
                     </div>
                 </form>
@@ -343,13 +326,17 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                     <?php
                         $startPage = max(1, $currentPage - 2);
                         $endPage = min($totalPages, $currentPage + 2);
-                        if ($startPage > 1) echo '<button class="pagination-page-btn btn btn-sm btn-outline-secondary" disabled style="cursor: default; border-color: transparent;">...</button>';
+                        if ($startPage > 1) {
+                            echo '<button class="pagination-page-btn btn btn-sm btn-outline-secondary d-none d-sm-inline-block" disabled style="cursor: default; border-color: transparent;">...</button>';
+                        }
                         for ($p = $startPage; $p <= $endPage; $p++) {
-                            $activeClass = $p === $currentPage ? 'active btn-primary' : 'btn-outline-secondary';
+                            $activeClass = $p === $currentPage ? 'active btn-primary' : 'btn-outline-secondary d-none d-sm-inline-block';
                             $activeStyle = $p === $currentPage ? 'background-color: var(--primary, #0A4D9E); color: white; border-color: var(--primary, #0A4D9E);' : '';
                             echo '<a href="'.$build_page_url($p).'" class="pagination-page-btn btn btn-sm '.$activeClass.'" style="text-decoration:none; '.$activeStyle.'">'.$p.'</a>';
                         }
-                        if ($endPage < $totalPages) echo '<button class="pagination-page-btn btn btn-sm btn-outline-secondary" disabled style="cursor: default; border-color: transparent;">...</button>';
+                        if ($endPage < $totalPages) {
+                            echo '<button class="pagination-page-btn btn btn-sm btn-outline-secondary d-none d-sm-inline-block" disabled style="cursor: default; border-color: transparent;">...</button>';
+                        }
                     ?>
                     
                     <a href="<?= $build_page_url(min($totalPages, $currentPage + 1)) ?>" class="pagination-page-btn btn btn-sm btn-outline-secondary" title="Next Page" <?= $currentPage >= $totalPages ? 'style="pointer-events:none; opacity:0.5;"' : '' ?>>
@@ -365,8 +352,8 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
                         const urlParams = new URLSearchParams(window.location.search);
                         urlParams.set('per_page', this.value);
                         urlParams.set('page', '1');
-                        window.location.hash = 'monitoring-data';
-                        window.location.search = urlParams.toString();
+                        const newUrl = window.location.pathname + '?' + urlParams.toString();
+                        loadLandingData(newUrl);
                     ">
                         <option value="10" <?= $perPage == 10 ? 'selected' : '' ?>>10 / halaman</option>
                         <option value="25" <?= $perPage == 25 ? 'selected' : '' ?>>25 / halaman</option>
@@ -380,43 +367,127 @@ $persen_belum   = $total_item > 0 ? ($belum_update/$total_item)*100 : 0;
     </div>
     
     <script>
+        window.submitFilters = function() {
+            const form = document.querySelector('form[action="<?= base_url('landing') ?>"]');
+            if (!form) return;
+            const url = new URL(form.action);
+            const formData = new FormData(form);
+            for (const [key, value] of formData.entries()) {
+                if (value) {
+                    url.searchParams.append(key, value);
+                }
+            }
+            url.searchParams.delete('page');
+            
+            const currentUrl = new URL(window.location.href);
+            if (currentUrl.searchParams.has('year')) url.searchParams.set('year', currentUrl.searchParams.get('year'));
+            if (currentUrl.searchParams.has('triwulan')) url.searchParams.set('triwulan', currentUrl.searchParams.get('triwulan'));
+            
+            loadLandingData(url.toString());
+        };
+
+        window.loadLandingData = function(url, pushState = true) {
+            const tbody = document.querySelector('.table-responsive tbody');
+            if (tbody) tbody.style.opacity = '0.5';
+
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                const activeElementId = document.activeElement ? document.activeElement.id : null;
+                const selectionStart = document.activeElement && document.activeElement.tagName === 'INPUT' ? document.activeElement.selectionStart : null;
+                const selectionEnd = document.activeElement && document.activeElement.tagName === 'INPUT' ? document.activeElement.selectionEnd : null;
+
+                const newTbody = doc.querySelector('.table-responsive tbody');
+                if (newTbody) tbody.innerHTML = newTbody.innerHTML;
+                if (tbody) tbody.style.opacity = '1';
+
+                const currentPagination = document.querySelector('.pagination-wrapper');
+                const newPagination = doc.querySelector('.pagination-wrapper');
+                
+                if (currentPagination && newPagination) {
+                    currentPagination.innerHTML = newPagination.innerHTML;
+                } else if (!currentPagination && newPagination) {
+                    document.querySelector('.table-responsive').insertAdjacentElement('afterend', newPagination);
+                } else if (currentPagination && !newPagination) {
+                    currentPagination.remove();
+                }
+
+                const currentResetBtn = document.getElementById('resetFilterBtn');
+                const newResetBtn = doc.getElementById('resetFilterBtn');
+                if (currentResetBtn && newResetBtn) {
+                    currentResetBtn.style.display = newResetBtn.style.display;
+                    currentResetBtn.href = newResetBtn.href;
+                }
+
+                if (activeElementId) {
+                    const el = document.getElementById(activeElementId);
+                    if (el) {
+                        el.focus();
+                        if (el.tagName === 'INPUT' && selectionStart !== null) {
+                            el.setSelectionRange(selectionStart, selectionEnd);
+                        }
+                    }
+                }
+
+                if (pushState) {
+                    window.history.pushState({path: url}, '', url);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                if (tbody) tbody.style.opacity = '1';
+            });
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('search');
             let debounceTimer;
-
-            if (sessionStorage.getItem('searchFocus') === '1' && searchInput) {
-                searchInput.focus();
-                const val = searchInput.value;
-                searchInput.value = '';
-                searchInput.value = val;
-                sessionStorage.removeItem('searchFocus');
-            } else if (searchInput && searchInput.value !== '') {
-                searchInput.focus();
-                const val = searchInput.value;
-                searchInput.value = '';
-                searchInput.value = val;
-            }
 
             if (searchInput) {
                 searchInput.addEventListener('input', function() {
                     clearTimeout(debounceTimer);
                     if (this.value === '') {
-                        sessionStorage.setItem('searchFocus', '1');
-                        this.form.submit();
+                        submitFilters();
                         return;
                     }
                     debounceTimer = setTimeout(() => {
-                        sessionStorage.setItem('searchFocus', '1');
-                        this.form.submit();
+                        submitFilters();
                     }, 600);
                 });
-                
-                searchInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        sessionStorage.setItem('searchFocus', '1');
-                    }
-                });
             }
+
+            // Handle pagination clicks via AJAX
+            document.addEventListener('click', function(e) {
+                const paginationLink = e.target.closest('.pagination-page-btn');
+                const resetBtn = e.target.closest('.btn-secondary');
+
+                if (paginationLink && paginationLink.tagName === 'A' && !paginationLink.hasAttribute('disabled')) {
+                    e.preventDefault();
+                    loadLandingData(paginationLink.href);
+                } else if (resetBtn && resetBtn.tagName === 'A' && resetBtn.textContent.trim() === 'Reset Filter') {
+                    e.preventDefault();
+                    const url = new URL(resetBtn.href);
+                    // Ensure year/triwulan is kept when resetting
+                    const currentUrl = new URL(window.location.href);
+                    if (currentUrl.searchParams.has('year')) url.searchParams.set('year', currentUrl.searchParams.get('year'));
+                    if (currentUrl.searchParams.has('triwulan')) url.searchParams.set('triwulan', currentUrl.searchParams.get('triwulan'));
+                    
+                    // Reset input values manually so they clear right away
+                    if(document.getElementById('search')) document.getElementById('search').value = '';
+                    if(document.getElementById('category')) document.getElementById('category').value = '';
+                    if(document.getElementById('status')) document.getElementById('status').value = '';
+                    
+                    loadLandingData(url.toString());
+                }
+            });
+
+            // Handle back/forward buttons
+            window.addEventListener('popstate', function() {
+                loadLandingData(window.location.href, false);
+            });
         });
     </script>
 

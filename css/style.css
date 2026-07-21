@@ -781,6 +781,8 @@ table.custom-table tbody tr:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
     margin-top: 1.5rem;
     background-color: var(--white);
     border: 1px solid var(--neutral-light);
@@ -792,6 +794,7 @@ table.custom-table tbody tr:hover {
 .pagination-pages {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 0.35rem;
 }
 

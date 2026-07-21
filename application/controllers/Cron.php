@@ -17,7 +17,7 @@ class Cron extends CI_Controller {
 
     public function check_deadline() {
         // 1. Ambil semua data monitoring yang belum selesai (pending / progress)
-        $this->db->select('monitoring.*, master_informasi.name as master_name');
+        $this->db->select('monitoring.*, master_informasi.name as master_name, master_informasi.timeline');
         $this->db->from('monitoring');
         $this->db->join('master_informasi', 'master_informasi.id = monitoring.master_id', 'left');
         $this->db->where_in('monitoring.status', ['pending', 'progress']);
@@ -25,6 +25,7 @@ class Cron extends CI_Controller {
         $pendingTasks = $this->db->get()->result_array();
 
         $messagesSent = 0;
+        $today = date('Y-m-d');
 
         foreach ($pendingTasks as $task) {
             // Jika tidak ada PJ, skip
@@ -33,58 +34,66 @@ class Cron extends CI_Controller {
             }
 
             // 2. Cari data karyawan berdasarkan nama PJ
-            // Menggunakan pencarian LIKE karena pj bisa berupa teks bebas
             $this->db->like('nama', $task['pj']);
             $user = $this->db->get('users')->row_array();
 
-            if ($user) {
-                // 3. Logika Pengecekan Tanggal
-                // KARENA 'deadline_date' BELUM ADA DI DATABASE, INI ADALAH KERANGKA LOGIKANYA:
-                $isHMinus3 = false;
-                $isHariH = false;
+            if ($user && !empty($user['telp'])) {
+                // 3. Logika Pengecekan Tanggal H-1 berdasarkan Timeline
+                $timeline = strtolower($task['timeline']);
+                $shouldNotify = false;
+                $peringatan = "DEADLINE TINGGAL 1 HARI LAGI";
 
-                // [NANTI KETIKA FIELD deadline_date DIBUAT, UNCOMMENT KODE DI BAWAH INI]
-                /*
-                if (isset($task['deadline_date']) && !empty($task['deadline_date'])) {
-                    $deadline = strtotime($task['deadline_date']);
-                    $today = strtotime(date('Y-m-d'));
-                    
-                    // Selisih dalam hari
-                    $diffDays = round(($deadline - $today) / (60 * 60 * 24));
-                    
-                    if ($diffDays == 3) {
-                        $isHMinus3 = true;
-                    } elseif ($diffDays == 0) {
-                        $isHariH = true;
+                if ($timeline == 'harian') {
+                    // Harian: Kirim setiap hari
+                    $shouldNotify = true;
+                } else if ($timeline == 'mingguan') {
+                    // Mingguan: Asumsi deadline Jumat, H-1 adalah Kamis (4)
+                    if (date('w') == 4) {
+                        $shouldNotify = true;
+                    }
+                } else if ($timeline == 'bulanan') {
+                    // Bulanan: H-1 dari hari terakhir bulan ini
+                    $last_day_this_month = date('Y-m-t');
+                    $h_minus_1 = date('Y-m-d', strtotime($last_day_this_month . ' -1 day'));
+                    if ($today == $h_minus_1) {
+                        $shouldNotify = true;
+                    }
+                } else if ($timeline == 'triwulan') {
+                    // Triwulan: H-1 dari (31 Mar, 30 Jun, 30 Sep, 31 Des)
+                    $currentYear = date('Y');
+                    $h_minus_1_triwulans = [
+                        $currentYear . '-03-30',
+                        $currentYear . '-06-29',
+                        $currentYear . '-09-29',
+                        $currentYear . '-12-30'
+                    ];
+                    if (in_array($today, $h_minus_1_triwulans)) {
+                        $shouldNotify = true;
+                    }
+                } else if ($timeline == 'tahunan') {
+                    // Tahunan: H-1 dari akhir tahun (31 Des)
+                    $h_minus_1 = date('Y') . '-12-30';
+                    if ($today == $h_minus_1) {
+                        $shouldNotify = true;
                     }
                 }
-                */
+                // Untuk 'realtime', diabaikan karena sudah dikirim saat update form
 
-                // UNTUK TESTING SAAT INI, KITA ANGGAP SELALU TERPENUHI ATAU BISA DI-MOCK:
-                // Hapus atau comment baris ini nanti saat production
-                $isHMinus3 = true; // Flag testing
-
-                if ($isHMinus3 || $isHariH) {
+                if ($shouldNotify) {
                     $title = !empty($task['custom_name']) ? $task['custom_name'] : $task['master_name'];
-                    $peringatan = $isHariH ? "HARI INI ADALAH DEADLINE" : "DEADLINE TINGGAL 3 HARI LAGI";
+                    $status_indo = '';
+                    if ($task['status'] == 'pending') $status_indo = 'Belum Update';
+                    else if ($task['status'] == 'progress') $status_indo = 'Dalam Proses';
                     
                     $message = "Halo *" . $user['nama'] . "*,\n\n";
-                    $message .= "Pemberitahuan dari Sistem PEPADUN: " . $peringatan . ".\n\n";
-                    $message .= "Informasi/Laporan: *" . $title . "*\n";
-                    $message .= "Status Saat Ini: " . strtoupper($task['status']) . "\n\n";
-                    $message .= "Mohon segera diselesaikan atau diupdate statusnya. Terima kasih.";
+                    $message .= "Pemberitahuan dari Sistem Monitoring: *" . $peringatan . "*.\n\n";
+                    $message .= "Kegiatan: *" . $title . "*\n";
+                    $message .= "Status Saat Ini: *" . $status_indo . "*\n\n";
+                    $message .= "Mohon segera diselesaikan atau diupdate statusnya menjadi Selesai. Terima kasih.";
 
-                    // 4. Kirim Notifikasi via WhatsApp
-                    if (!empty($user['telp'])) {
-                        $this->_sendWhatsApp($user['telp'], $message);
-                        $messagesSent++;
-                    }
-
-                    // 5. Kirim Notifikasi via Email
-                    if (!empty($user['email'])) {
-                        $emailSubject = "[$peringatan] - Monitoring $title";
-                        $this->_sendEmail($user['email'], $emailSubject, $message);
-                    }
+                    // 4. Kirim Notifikasi via WhatsApp Local API
+                    $this->_sendWhatsApp($user['telp'], $message);
+                    $messagesSent++;
                 }
             }
         }
@@ -93,64 +102,23 @@ class Cron extends CI_Controller {
     }
 
     private function _sendWhatsApp($phone, $message) {
-        // [TODO] Integrasi dengan WhatsApp API Pihak Ketiga (Contoh: Fonnte, Watzap, Wablas)
-        // Di bawah ini adalah contoh template menggunakan curl untuk Fonnte API
+        $data = [
+            'number' => $phone,
+            'message' => $message
+        ];
+
+        $ch = curl_init('http://localhost:3000/send-message');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         
-        /*
-        $apiToken = 'TOKEN_API_ANDA_DISINI';
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-          CURLOPT_URL => 'https://api.fonnte.com/send',
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => '',
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => 'POST',
-          CURLOPT_POSTFIELDS => array(
-            'target' => $phone,
-            'message' => $message, 
-          ),
-          CURLOPT_HTTPHEADER => array(
-            "Authorization: $apiToken"
-          ),
-        ));
+        $response = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
         
-        $response = curl_exec($curl);
-        curl_close($curl);
-        // return json_decode($response, true);
-        */
-        
-        // Log untuk simulasi jika belum ada API
-        log_message('info', "Simulasi WA Terkirim ke $phone:\n$message");
+        log_message('info', "Respon WA Local API ke $phone: $response | Error: $err");
     }
 
-    private function _sendEmail($to, $subject, $message) {
-        $this->load->library('email');
-        
-        // [TODO] Konfigurasi SMTP (sesuaikan dengan server Anda di application/config/email.php atau di sini)
-        /*
-        $config = Array(
-            'protocol' => 'smtp',
-            'smtp_host' => 'ssl://smtp.googlemail.com',
-            'smtp_port' => 465,
-            'smtp_user' => 'email_anda@gmail.com',
-            'smtp_pass' => 'password_app_anda',
-            'mailtype'  => 'text', 
-            'charset'   => 'utf-8'
-        );
-        $this->email->initialize($config);
-        $this->email->set_newline("\r\n");
-        */
-        
-        $this->email->from('no-reply@pepadun.com', 'Sistem PEPADUN');
-        $this->email->to($to);
-        $this->email->subject($subject);
-        $this->email->message($message);
-        
-        // $this->email->send();
-        
-        log_message('info', "Simulasi Email Terkirim ke $to dengan subjek: $subject");
-    }
 }

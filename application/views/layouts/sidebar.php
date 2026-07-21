@@ -22,7 +22,7 @@
             
             // Dynamic years based on current year
             $currentYear = (int) date('Y');
-            $years = [$currentYear, $currentYear - 1, $currentYear - 2];
+            $years = [$currentYear, $currentYear - 1];
             
             $selectedYear = (int) ($CI->input->get('year') !== NULL ? $CI->input->get('year') : date('Y'));
             $selectedTriwulan = (int) ($CI->input->get('triwulan') !== NULL ? $CI->input->get('triwulan') : ceil(date('m') / 3));
