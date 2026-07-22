@@ -70,6 +70,16 @@ class Cron extends CI_Controller {
                     if (in_array($today, $h_minus_1_triwulans)) {
                         $shouldNotify = true;
                     }
+                } else if ($timeline == 'semester') {
+                    // Semester: H-1 dari (30 Jun, 31 Des)
+                    $currentYear = date('Y');
+                    $h_minus_1_semesters = [
+                        $currentYear . '-06-29',
+                        $currentYear . '-12-30'
+                    ];
+                    if (in_array($today, $h_minus_1_semesters)) {
+                        $shouldNotify = true;
+                    }
                 } else if ($timeline == 'tahunan') {
                     // Tahunan: H-1 dari akhir tahun (31 Des)
                     $h_minus_1 = date('Y') . '-12-30';
